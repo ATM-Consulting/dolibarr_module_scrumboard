@@ -28,3 +28,13 @@ showDateInDescription=Voir les dates dans la description
 
 SB_realtimealt=Temps consommé
 SB_allowedtimealt=Temps prévu
+ScrumManageColumns=Scrumboard - Gestion des colonnes
+ScrumTasksColumnChanged=Les tâches des colonnes inactives ont été déplacées dans la colonne "En Cours"
+ScrumBeginMigration=Êtes-vous sûr(e) de vouloir lancer la migration ?
+
+AddStorie=Ajouter un sprint ?
+AddStorieName=Nom du sprint
+AddStorieTask=Créer sprint
+ConfirmDeleteStorie=Supprimer sprint
+DeleteStorie=Êtes-vous sûr de vouloir effacer ce sprint ?
+EmptyDate=Veuillez renseigner les dates du sprint !

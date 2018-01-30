@@ -48,6 +48,12 @@ function _put(&$db, $case) {
 			_reset_date_task($db,(int)GETPOST('id_project'), (float)GETPOST('velocity') * 3600);
 			
 			break;
+		case 'add_new_storie':
+			_add_new_storie($db, (int)GETPOST('id_project'), GETPOST('storie_name'));
+			break;
+		case 'toggle_storie_visibility':
+			_toggle_storie_visibility($db, (int)GETPOST('id_project'), (int)GETPOST('storie_order'));
+			break;
 
 	}
 
@@ -154,7 +160,7 @@ function _set_values(&$object, $values) {
 	
 }
 function _task(&$db, $id_task, $values=array()) {
-global $user, $langs,$conf;
+	global $user, $langs,$conf;
 
 	$task=new Task($db);
 	if($id_task) $task->fetch($id_task);
@@ -172,7 +178,7 @@ global $user, $langs,$conf;
 		else if($values['status']=='todo') {
 			$task->progress = 0;
 		}
-	
+
 		$task->status = $values['status'];
 		$task->update($user);
 		
@@ -273,7 +279,7 @@ function _get_delivery_date_with_velocity(&$db, &$task, $velocity, $time=null) {
 }	
 
 function _reset_date_task(&$db, $id_project, $velocity) {
-global $user;
+	global $user;
 
 	if($velocity==0) return false;
 
@@ -320,6 +326,18 @@ function _tasks(&$db, $id_project, $status, $fk_user) {
 		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'c_type_contact tc ON (tc.rowid = ec.fk_c_type_contact)';
 	}
 	
+	
+	/** TO TEST **/
+//	$sql.= ' WHERE 1 ';
+//	$sql.= ' AND (scrum_status IS NOT NULL AND scrum_status = "'.$status.'")';
+//	
+//	if($status=='ideas') $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL) AND datee IS NULL)';
+//	else if($status=='todo') $sql.= ' OR (scrum_status IS NULL AND  (progress = 0  OR progress IS NULL))';
+//	else if($status=='inprogress') $sql.= ' OR (scrum_status IS NULL AND  progress > 0 AND progress < 100)';
+//	else if($status=='finish') $sql.= ' OR (scrum_status IS NULL AND  progress=100)';
+	/*******/
+	
+	/** ORIGINE ***/
 	if($status=='ideas') {
 		$sql.= ' WHERE  (progress = 0 OR progress IS NULL) AND datee IS NULL';
 	}	
@@ -332,6 +350,8 @@ function _tasks(&$db, $id_project, $status, $fk_user) {
 	else if($status=='finish') {
 		$sql.= ' WHERE progress=100';
 	}
+	/****/
+	
 	
 	if($id_project > 0) $sql.= ' AND fk_projet='.$id_project;
 	
@@ -342,8 +362,7 @@ function _tasks(&$db, $id_project, $status, $fk_user) {
 	
 	$sql.= ' ORDER BY pt.rang';
 
-	$res = $db->query($sql);	
-		
+	$res = $db->query($sql);
 		
 	$TTask = array();
 	while($obj = $db->fetch_object($res)) {
@@ -351,4 +370,42 @@ function _tasks(&$db, $id_project, $status, $fk_user) {
 	}
 	
 	return $TTask;
+}
+
+function _add_new_storie(&$db, $id_project, $storie_name) {
+	global $langs;
+
+	$storie_order = GETPOST('storie_order', 'int');
+	$storie_date_start = GETPOST('add_storie_date_start');
+	$storie_date_end = GETPOST('add_storie_date_end');
+
+	if(empty($storie_date_start) || empty($storie_date_end)) {
+		setEventMessage($langs->trans('EmptyDate'), 'errors');
+	}
+	else {
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'projet_storie(fk_projet, storie_order, label, date_start, date_end)';
+		$sql .= " VALUES($id_project, $storie_order, '$storie_name', '$storie_date_start', '$storie_date_end')";
+
+		$db->query($sql);
+	}
+}
+
+function _toggle_storie_visibility(&$db, $id_project, $storie_order) {
+	$sql = 'SELECT visible';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " WHERE fk_projet=$id_project";
+	$sql .= " AND storie_order=$storie_order";
+	
+	$resql = $db->query($sql);
+	if($obj = $db->fetch_object($resql)) {
+		$new_value = (int)!$obj->visible;
+		
+		$sql = 'UPDATE '.MAIN_DB_PREFIX.'projet_storie';
+		$sql .= ' SET visible='.$new_value;
+		$sql .= " WHERE fk_projet=$id_project";
+		$sql .= " AND storie_order=$storie_order";
+		
+		$db->query($sql);
+	}
+	return $new_value;
 }

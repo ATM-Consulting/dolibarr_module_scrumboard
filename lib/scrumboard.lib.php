@@ -77,3 +77,176 @@ function scrum_getVelocity(&$db, $id_project) {
 
 	return $velocity;	
 }
+
+/**
+ * Retourne toutes les colonnes actives du scrumboard.
+ * S'il existe des tâches liées à des colonnes inexistantes ou inactives, on les lies à la colonne "toDo"
+ * @param	int $fk_project
+ * @return array
+ */
+function scrum_getAllColumns($fk_project) {
+	global $db;
+	$TColumns = array();
+
+	$sql = 'SELECT rowid, label, active, code';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'c_scrum_columns';
+	$sql .= ' ORDER BY col_order ASC';
+
+	$resql = $db->query($sql);
+	while ($obj = $db->fetch_object($resql)) {
+		if(! empty($obj->active)) $TColumns[] = $obj;
+	}
+	scrum_setTasksColumn($fk_project);
+
+	return $TColumns;
+}
+
+/**
+ * Rattache les tâches liées aux colonnes non actives à la colonne "toDo"
+ * @param int $fk_project
+ */
+function scrum_setTasksColumn($fk_project) {
+	global $db, $langs;
+	$show_message = false;
+
+	$sql = 'SELECT rowid, scrum_status';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_task';
+	$sql .= ' WHERE fk_projet='.$fk_project;
+
+	$resql = $db->query($sql);
+	while ($objTask = $db->fetch_object($resql)) {
+		// Pour chaque tâche du projet, on vérifie que la colonne existe dans la table correspondante
+		$sql = 'SELECT rowid, active';
+		$sql .= ' FROM '.MAIN_DB_PREFIX.'c_scrum_columns';
+		$sql .= ' WHERE rowid='.$objTask->scrum_status;
+		$sql .= ' ORDER BY col_order ASC';
+
+		$res = $db->query($sql);
+		if($objCol = $db->fetch_object($res)) {
+			// Si la colonne existe mais qu'elle n'est pas active : on change de colonne pour la tâche
+			if(empty($objCol->active)) {
+				$show_message = true;
+				scrum_updateScrumStatus($fk_project, $objTask->scrum_status);
+			}
+		}
+		else {
+			// Si la colonne n'existe pas : on change de colonne pour la tâche
+			$show_message = true;
+			scrum_updateScrumStatus($fk_project, $objTask->scrum_status);
+		}
+	}
+	if($show_message) {
+		setEventMessage($langs->trans('ScrumTasksColumnChanged'), 'warnings'	);
+	}
+}
+
+/**
+ * Rattache les tâches identifiées par les paramètres à la colonne "toDo"
+ * @param int $fk_project
+ * @param int $old_scrum_status		identifiant de la colonne inactive ou inexistante
+ */
+function scrum_updateScrumStatus($fk_project, $old_scrum_status) {
+	global $db;
+
+	$sql = 'UPDATE '.MAIN_DB_PREFIX.'projet_task';
+	$sql .= ' SET scrum_status=1';
+	$sql .= ' WHERE fk_projet='.$fk_project;
+	$sql .= ' AND scrum_status='.$old_scrum_status;
+	$db->query($sql);
+}
+
+/**
+ * Renvoie l'id de la colonne dont le label correspond à $column_label
+ * @param	int $column_label
+ * @return int
+ */
+function scrum_getColumnId($column_label) {
+	global $db;
+
+	$sql = 'SELECT rowid, active';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'c_scrum_columns';
+	$sql .= ' WHERE lower(label)=\''.$column_label.'\'';
+
+	$resql = $db->query($sql);
+	if($obj = $db->fetch_object($resql)) {
+		if(! empty($obj->active)) {
+			return $obj->rowid;
+		}
+	}
+
+	return 0;
+}
+
+function scrum_getAllStories($fk_project) {
+	global $db;
+
+	$sql = 'SELECT storie_order, label, date_start, date_end';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " WHERE fk_projet=$fk_project";
+	$sql .= ' ORDER BY storie_order ASC';
+
+	$resql = $db->query($sql);
+
+	$TStories = array();
+	while($obj = $db->fetch_object($resql)) {
+		$TStories[$obj->storie_order] = $obj;
+	}
+
+	return $TStories;
+}
+
+function scrum_getStorie($fk_project, $storie_k) {
+	global $db;
+
+	$sql = 'SELECT label';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " WHERE fk_projet=$fk_project";
+	$sql .= " AND storie_order=$storie_k";
+
+	$resql = $db->query($sql);
+
+	if($obj = $db->fetch_object($resql)) {
+		return $obj->label;
+	}
+	return '';
+}
+
+function scrum_updateStorie($fk_project, $storie_k, $storie_label, $date_start, $date_end) {
+	global $db;
+	
+	$sql = 'UPDATE '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " SET label='$storie_label',";
+	$sql .= ' date_start="'.date('Y-m-d', strtotime(preg_replace('/\//', '-', $date_start))).'",';
+	$sql .= ' date_end="'.date('Y-m-d', strtotime(preg_replace('/\//', '-', $date_end))).'"';
+	$sql .= " WHERE fk_projet=$fk_project";
+	$sql .= " AND storie_order=$storie_k";
+
+	$db->query($sql);
+}
+
+function scrum_deleteStorie($fk_project, $storie_k) {
+	global $db;
+
+	$sql = 'DELETE';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " WHERE fk_projet=$fk_project";
+	$sql .= " AND storie_order=$storie_k";
+
+	$db->query($sql);
+}
+
+function scrum_isStorieVisible($fk_project, $storie_k) {
+	global $db;
+
+	$sql = 'SELECT visible';
+	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_storie';
+	$sql .= " WHERE fk_projet=$fk_project";
+	$sql .= " AND storie_order=$storie_k";
+
+	$resql = $db->query($sql);
+
+	if($obj = $db->fetch_object($resql)) {
+		return ($obj->visible == 1);
+	}
+	return false;
+}
