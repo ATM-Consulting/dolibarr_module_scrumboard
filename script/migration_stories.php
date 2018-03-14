@@ -80,6 +80,29 @@ if(empty($error)) {
 	}
 }
 
+// Ajoute un lien element_element entre les tâches et la ligne de propale associée
+$taskPrefix = 'TA';
+
+$sql = 'SELECT rowid, ref, fk_projet';
+$sql .= ' FROM '.MAIN_DB_PREFIX.'projet_task';
+$sql .= " WHERE ref LIKE '".$taskPrefix."%'";
+$sql .= " AND ref NOT LIKE 'TK%'";	// Ne pas prendre en compte les tâches créées depuis le scrumboard
+$sql .= " AND rowid NOT IN (SELECT fk_target FROM ".MAIN_DB_PREFIX."element_element WHERE targettype='project_task')";	// On ne prend pas la tâche si elle possède déjà un lien
+
+$resql = $db->query($sql);
+if($resql) {
+	while($obj = $db->fetch_object($resql)) {
+		$fk_line = substr($obj->ref, strlen($taskPrefix));	// Récupère l'identifiant de la ligne de propale en omettant le préfixe des tâches : 'TA125' ==> '125'
+
+		$task = new Task($db);
+		$task->fetch($obj->rowid);
+		$task->fetchObjectLinked();
+
+		if($taskPrefix == 'TA') $sourceType = 'propaldet';
+		if(! empty($sourceType) && empty($task->linkedObjectsIds[$sourceType])) $task->add_object_linked($sourceType, $fk_line);
+	}
+}
+
 function getData() {
 	global $db;
 
