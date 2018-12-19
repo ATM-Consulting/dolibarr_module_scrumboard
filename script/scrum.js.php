@@ -5,6 +5,7 @@
 	
 
 ?>
+
 /* <script type="text/javascript"> */
 	
 function project_velocity(id_project) {
@@ -243,6 +244,21 @@ function project_refresh_task(id_project, task) {
 			$item.css('background-color','orange');
 		}
 	}
+
+	$(".classfortooltip").tooltip({
+		show: { collision: "flipfit", effect:'toggle', delay:50 },
+		hide: { delay: 50 },
+		tooltipClass: "mytooltip",
+		content: function () {
+				return $(this).prop('title');		/* To force to get title as is */
+			}
+	});
+
+
+
+
+
+	
 }
 
 function project_get_task(id_project, id_task) {
@@ -373,6 +389,7 @@ function project_loadTasks(id_projet) {
 	?>
 	project_get_tasks(id_projet , 'unknownColumn');
 }
+
 function create_task(id_projet) {
 	
 	if($('#dialog-create-task').length==0) {
@@ -504,7 +521,7 @@ function pop_time(id_project, id_task) {
 				});
 }
 
-<?php if(!empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK)) { ?>
+<?php if(!empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK))  { ?>
 <!--  Commentary conf -->
 
 		

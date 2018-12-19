@@ -659,7 +659,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 			</ul>
 			
 		</div>
-		
+
 		
 		<div id="saisie" style="display:none;"></div>
 		<div id="reset-date" title="<?php echo $langs->trans('ResetDate'); ?>" style="display:none;">

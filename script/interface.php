@@ -138,7 +138,6 @@ global $langs;
 		return $Tab;
 	
 }
-
 function _sort_task(&$db, $TTask) {
 	global $user;
 	
@@ -269,6 +268,7 @@ function _getTContact(&$task)
 			$user->lastname = $row['lastname'];
 			$user->firstname = $row['firstname'];
 			$task->internal_contacts .= $user->getNomUrl(1).'&nbsp;';
+			
 		}
 	}
 
