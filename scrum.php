@@ -35,6 +35,7 @@
 	llxHeader('', $langs->trans('Tasks') , '','',0,0, array('/scrumboard/script/scrum.js.php'), $TArrayOfCss);
 	
 	$id_projet = (int)GETPOST('id');
+	$ref_projet = GETPOST('ref');
 	$action = GETPOST('action');
 	$storie_k_toEdit = GETPOST('storie_k', 'int');
 	$storie_date_start = GETPOST('storie_date_start');
@@ -77,7 +78,11 @@
 	}
 
 	$object = new Project($db);
-	$object->fetch($id_projet);
+	if(!empty($ref_projet)) {
+	    $object->fetch('',$ref_projet);
+	    $id_projet=$object->id;
+    }
+	else $object->fetch($id_projet);
 	if (method_exists($object, 'fetch_thirdparty')) $object->fetch_thirdparty();
 	if (empty($object->societe) && !empty($object->thirdparty)) $object->societe = $object->thirdparty; // Rétrocompatibilité
 	if ($object->societe->id > 0)  $result=$object->societe->fetch($object->societe->id);
