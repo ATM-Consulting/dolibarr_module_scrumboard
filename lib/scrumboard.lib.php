@@ -270,7 +270,7 @@ function getSQLForTasks(
 		$sql .= ' AND soc.fk_departement = ' . $state_filter;
 	}
 
-	$sql.= ' ORDER BY pt.rang';
+	$sql.= ' ORDER BY pt.rang, pt.rowid';
 
 	return $sql;
 }
