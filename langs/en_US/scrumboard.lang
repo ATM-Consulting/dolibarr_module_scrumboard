@@ -49,9 +49,9 @@ LinkContact = Assign contact
 UsersAddedToTask = %s tasks updated
 UsersAddedToTaskError = %d errors found during assignment
 
-soc_type_onlycompany = only parent company
-soc_type_onlychildren = only branch companies
-soc_type_both = both
+soc_type_onlycompany = Only parent company
+soc_type_onlychildren = Only branch companies
+soc_type_both = Both
 
 FilterDateStartAfter = Start date between
 FilterDateStartBefore = and
