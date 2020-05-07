@@ -251,6 +251,7 @@ function getSQLForTasks(
 
 		if (empty($reshook))
 		{
+			$object = $task;
 			// Add where from extra fields
 			include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_list_search_sql.tpl.php';
 		}
