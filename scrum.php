@@ -77,6 +77,22 @@
 			'Ref'         => 'ref',
 			'ScrumStatus' => 'scrum_status',
 			'Label'       => 'label',
+			'Contact' => function (&$obj) use ($db) {
+				$task = new Task($db);
+				if ($task->fetch($obj['id']) > 0) {
+					$tab = $task->liste_contact(-1, 'internal');
+					$contactAndRole=array();
+					foreach ($tab as $k=>$v)
+					{
+						if ($v['source']=='internal')
+						{
+							$contactAndRole[]=$v['lastname'].' '.$v['firstname']. ' ('.$v['libelle'].')';
+						}
+					}
+					return implode(' - ',$contactAndRole);
+				}
+				return '';
+			},
 			'DateStart'   => 'date_start',
 			'DateEnd'     => 'date_end',
 			'ProjectRef' => function (&$obj) use ($db) {
