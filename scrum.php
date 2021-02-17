@@ -1,6 +1,6 @@
 <?php
 /* Copyright (C) 2014 Alexis Algoud        <support@atm-conuslting.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -21,11 +21,12 @@
  *	\brief      Project card
  */
 
- 
+
 	require('config.php');
 
-	llxHeader('', $langs->trans('Tasks') , '','',0,0, array('/scrumboard/js/scrum.js.php'));
-	
+	$TInclude = array('/scrumboard/js/scrum.js.php');
+	llxHeader('', $langs->trans('Tasks') , '','',0,0, $TInclude);
+
 	$id_projet = (int) GETPOST('id');
 
 	$object = new Project($db);
@@ -40,12 +41,13 @@
 	else{
 		$head=array(0=>array('#', $langs->trans("Scrumboard"), 'scrumboard'));
 	}
-	
+
 	dol_fiche_head($head, 'scrumboard', $langs->trans("Scrumboard"),0,($object->public?'projectpub':'project'));
 
 	$form = new Form($db);
 	if($id_projet) {
-		
+
+
 	/*
 		 *   Projet synthese pour rappel
 		 */
@@ -82,22 +84,22 @@
 
 		// Statut
 		print '<tr><td>'.$langs->trans("Status").'</td><td>'.$object->getLibStatut(4).'<span rel="tobelate" date_end="'.$object->date_end.'"></span></td></tr>';
-	
+
 		// Statut
 		print '<tr><td>'.$langs->trans("CurrentVelocity").'</td><td rel="currentVelocity"></td></tr>';
 
 		print "</table>";
-		
+
 	}
 	else{
-		print $langs->trans("CurrentVelocity").' <span rel="currentVelocity"></span>';	
+		print $langs->trans("CurrentVelocity").' <span rel="currentVelocity"></span>';
 	}
-		
+
 ?>
 <link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',1) ?>">
 
 		<div class="content">
-	
+
 			<table id="scrum" id_projet="<?php echo $id_projet ?>">
 				<tr>
 					<!-- <td><?php echo $langs->trans('Ideas'); ?></td></td> -->
@@ -108,27 +110,27 @@
 				<tr>
 					<!-- <td class="projectDrag droppable" id="task-idea" rel="idea">
 						<ul id="list-task-idea" class="task-list" rel="idea">
-						
+
 						</ul>
 					</td> -->
 					<td class="projectDrag droppable" id="task-todo" rel="todo">
 						<ul id="list-task-todo" class="task-list" rel="todo">
-						
+
 						</ul>
 					</td>
 					<td class="projectDrag droppable" id="task-inprogress" rel="inprogress">
 						<ul id="list-task-inprogress" class="task-list" rel="inprogress">
-						
+
 						</ul>
 					</td>
 					<td class="projectDrag droppable" id="task-finish" rel="finish">
 						<ul id="list-task-finish" class="task-list" rel="finish">
-						
+
 						</ul>
 					</td>
 				</tr>
 			</table>
-<?php	
+<?php
 	/*
 	 * Actions
 	*/
@@ -167,14 +169,14 @@
 	<span style="background-color:red;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('TaskWontfinishInTime'); ?><br />
 	<span style="background-color:orange;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('TaskMightNotfinishInTime'); ?><br />
 	<span style="background-color:#CCCCCC;">&nbsp;&nbsp;&nbsp;&nbsp;</span> <?php echo $langs->trans('BarProgressionHelp'); ?>
-	
+
 </div>
 
-		
+
 		</div>
-		
+
 		<div style="display:none">
-			
+
 			<ul>
 			<li id="task-blank">
 				<div class="progressbaruser"></div>
@@ -189,24 +191,24 @@
 				</select>
 				<span rel="time"></span>
 				</div>
-				
+
 				<?php echo img_picto('', 'object_scrumboard@scrumboard') ?><span rel="project"></span> [<a href="#" rel="ref"> </a>] <span rel="label" class="classfortooltip" title="">label</span>
-				<br /><span class="font-small" rel="list_of_user_affected"></span> 
+				<br /><span class="font-small" rel="list_of_user_affected"></span>
 			</li>
 			</ul>
-			
+
 		</div>
-		
-		
+
+
 		<div id="saisie" style="display:none;"></div>
 		<div id="reset-date" title="<?php echo $langs->trans('ResetDate'); ?>" style="display:none;">
-			
+
 			<p><?php echo $langs->trans('ResetDateWithThisVelocity'); ?> : </p>
-			
+
 			<input type="text" name="velocity" size="5" id="current-velocity" value"<?php echo $conf->global->SCRUM_DEFAULT_VELOCITY*3600; ?>" /> <?php echo $langs->trans('HoursPerDay') ?>
-			
+
 		</div>
-		
+
 		<script type="text/javascript">
 			$(document).ready(function() {
 				project_loadTasks(<?php echo $id_projet ?>);
@@ -214,7 +216,7 @@
 				project_velocity(<?php echo $id_projet ?>);
 			});
 		</script>
-		
+
 <?php
 
 	llxFooter();
