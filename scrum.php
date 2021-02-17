@@ -25,9 +25,6 @@
 	require('config.php');
 
 	$TInclude = array('/scrumboard/js/scrum.js.php');
-	if(!defined('DISABLE_JQUERY_TIPTIP') && !is_file(DOL_URL_ROOT.'/includes/jquery/plugins/tiptip/tipTip.css')) {
-		$TInclude[] = '/ordo/js/jquery.tipTip.minified.js';
-	}
 	llxHeader('', $langs->trans('Tasks') , '','',0,0, $TInclude);
 
 	$id_projet = (int) GETPOST('id');
@@ -49,6 +46,7 @@
 
 	$form = new Form($db);
 	if($id_projet) {
+
 
 	/*
 		 *   Projet synthese pour rappel
