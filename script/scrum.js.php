@@ -1,4 +1,7 @@
 <?php
+
+	if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
+
 	require('../config.php');
 	dol_include_once('/scrumboard/lib/scrumboard.lib.php');
 	dol_include_once('/scrumboard/class/scrumboard.class.php');

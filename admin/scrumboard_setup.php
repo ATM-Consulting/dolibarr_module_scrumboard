@@ -53,7 +53,7 @@ if (preg_match('/set_(.*)/',$action,$reg))
 	}
 	else if (dolibarr_set_const($db, $code, GETPOST($code), 'chaine', 0, '', $conf->entity) > 0)
 	{
-		
+
         setEventMessage( $langs->trans('RegisterSuccess') );
 		header("Location: ".$_SERVER["PHP_SELF"]);
 		exit;
@@ -97,14 +97,14 @@ function showParameters() {
 	print '<td>'.$langs->trans("Parameters").'</td>'."\n";
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="100">'.$langs->trans("Value").'</td>'."\n";
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 	print '<td>'.$langs->trans("NumberOfWorkingHourInDay").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+	print '<input type="hidden" name="token" value="'.newToken().'">';
 	print '<input type="hidden" name="action" value="set_SCRUM_DEFAULT_VELOCITY">';
 	print '<input type="text" name="SCRUM_DEFAULT_VELOCITY" value="'.$conf->global->SCRUM_DEFAULT_VELOCITY.'" size="3" />&nbsp;';
 	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
@@ -118,7 +118,7 @@ function showParameters() {
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_ADD_BACKLOG_REVIEW_COLUMN');
 	print '</td></tr>';
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 
@@ -127,43 +127,43 @@ function showParameters() {
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_FILTER_BY_USER_ENABLE');
 	print '</td></tr>';
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
-	
+
 	print '<td>'.$langs->trans("showLinkedContactToTask").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_SHOW_LINKED_CONTACT');
-	
+
 	print '</td></tr>';
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
-	
+
 	print '<td>'.$langs->trans("showDescriptionInTask").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_SHOW_DESCRIPTION_IN_TASK');
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
-	
+
 	print '<td>'.$langs->trans("showDateInDescription").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_SHOW_DATES_IN_DESCRIPTION');
-	
+
 	print '</td></tr>';
-	
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
-	
+
 	print '<td>'.$langs->trans("SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print ajax_constantonoff('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT');
-	
+
 	print '</td></tr>';
 
 	$var=!$var;
