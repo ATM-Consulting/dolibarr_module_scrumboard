@@ -1,5 +1,7 @@
 <?php
 
+if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
+
 require ('../config.php');
 require_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
