@@ -98,13 +98,15 @@ function showParameters() {
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="100">'.$langs->trans("Value").'</td>'."\n";
 
+	$newToken = function_exists('newToken')?newToken():$_SESSION['newtoken'];
+
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 	print '<td>'.$langs->trans("NumberOfWorkingHourInDay").'</td>';
 	print '<td align="center" width="20">&nbsp;</td>';
 	print '<td align="right" width="300">';
 	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
+	print '<input type="hidden" name="token" value="'.$newToken.'">';
 	print '<input type="hidden" name="action" value="set_SCRUM_DEFAULT_VELOCITY">';
 	print '<input type="text" name="SCRUM_DEFAULT_VELOCITY" value="'.$conf->global->SCRUM_DEFAULT_VELOCITY.'" size="3" />&nbsp;';
 	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
