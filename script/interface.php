@@ -1,6 +1,7 @@
 <?php
 
 if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
+if (!defined('NOCSRFCHECK')) define('NOCSRFCHECK', 1);
 
 require ('../config.php');
 require_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
