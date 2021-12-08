@@ -157,7 +157,7 @@ function getSQLForTasks(
 	}
 
 	if($status == 'unknownColumn') {
-		$sql .= ' WHERE (scrum_status NOT IN (SELECT code FROM '.MAIN_DB_PREFIX.'c_scrum_columns WHERE active=1))';
+		$sql .= ' WHERE (scrum_status NOT IN (SELECT code FROM '.MAIN_DB_PREFIX.'c_scrum_columns WHERE active=1) OR scrum_status IS NULL)';
 	}
 	else {
 		$sql.= ' WHERE 1 ';
