@@ -1261,15 +1261,15 @@ function _printExtrafieldsFilter()
 
 	$search_array_options = $extrafieldstask->getOptionalsFromPost($task->table_element, '', 'search_');
 
-	foreach ($extrafieldstask->attributes[$task->table_element]['list'] as $key => $list)
-	{
-		if ($list > 0)
-		{
-			echo '<tr><td>';
-			echo $extrafieldstask->attributes[$task->table_element]['label'][$key];
-			echo '</td><td>';
-			echo $extrafieldstask->showInputField($key, $search_array_options['search_options_'.$key], '', '', 'search_');
-			echo '</td></tr>';
+	if(!empty($extrafieldstask->attributes[$task->table_element]['list'])) {
+		foreach ($extrafieldstask->attributes[$task->table_element]['list'] as $key => $list) {
+			if ($list > 0) {
+				echo '<tr><td>';
+				echo $extrafieldstask->attributes[$task->table_element]['label'][$key];
+				echo '</td><td>';
+				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_');
+				echo '</td></tr>';
+			}
 		}
 	}
 }
