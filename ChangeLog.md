@@ -1,6 +1,7 @@
 
 
 ## NOT RELEASED
+- NEW : Ajout de la class TechATM pour l'affichage de la page "A propos" *11/05/2022* 2.4.0
 
 ## 2.3
 - FIX : add missing WHERE filter in SQL for unknown task status + missing NOCSRFCHECK - *09/12/2021* - 2.3.6
