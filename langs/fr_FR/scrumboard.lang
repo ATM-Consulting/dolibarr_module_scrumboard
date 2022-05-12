@@ -71,3 +71,4 @@ scrumboard_export = Exporter les tâches du scrumboard
 ScrumStatus=Statut
 ProjectRef=Réf. projet
 ProjectTitle=Titre du projet
+scrumboardAbout = À propos du module scrumboard
