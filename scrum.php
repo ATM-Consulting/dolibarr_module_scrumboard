@@ -33,6 +33,9 @@
 	$TArrayOfCss = array();
 	$TArrayOfCssClasses = array();
 
+    $newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
+
+
 	if((float) DOL_VERSION == 6.0) {
 		$TArrayOfCss[] = '/theme/common/fontawesome/css/font-awesome.css';
 	}
@@ -754,6 +757,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
     print '<hr style="clear:both;" />';
     print '<div id="form-add-ressource-task-'.$id_task.'" style="clear:both; margin: 2em 0;" >';
     print '<form  action="'.dol_buildpath('scrumboard/scrum.php',2).'" method="POST">';
+    print '<input type="hidden" name="token" value="'.$newToken.'">';
     print '<input type="hidden" name="id" value="'.$id_projet.'" />';
     print '<input type="hidden" name="action" value="addcontact" />';
     print '<input type="hidden" name="id_story" value="0" />';
@@ -832,7 +836,8 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 
     			    print '<div id="form-add-ressource-story-'.$storyToEdit->id.'" >';
-    			    print '<form  action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+                    print '<input type="hidden" name="token" value="'.$newToken.'">';
+                    print '<form  action="'.$_SERVER['PHP_SELF'].'" method="POST">';
     			    print '<input type="hidden" name="id" value="'.$id_projet.'" />';
     			    print '<input type="hidden" name="action" value="addcontact" />';
     			    print '<input type="hidden" name="id_story" value="'.$storie_k.'" />';
@@ -873,7 +878,8 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 					$storyToEdit->loadStory($id_projet, $storie_k);
 
 					print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
-					print '<input type="hidden" name="id" value="'.$id_projet.'" />';
+                    print '<input type="hidden" name="token" value="'.$newToken.'">';
+                    print '<input type="hidden" name="id" value="'.$id_projet.'" />';
 					print '<input type="hidden" name="action" value="save" />';
 					print '<input type="hidden" name="storie_k" value="'.$storie_k.'" />';
 					print '<input type="hidden" name="id_story" value="'.$storyToEdit->id.'" />';
