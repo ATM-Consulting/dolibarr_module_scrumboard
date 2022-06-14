@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.3.6';
+		$this->version = '2.3.7';
 		// Key used in llx_const table to save module status enabled/disabled
 		// (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
@@ -168,6 +168,13 @@ class modscrumboard extends DolibarrModules
 		// 'contact'			to add a tab in contact view
 		// 'categories_x'		to add a tab in category view
 		// (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
+
+		//Compatibilty V16
+		$dictionnariesTablePrefix = '';
+		if (intval(DOL_VERSION)< 16){
+			$dictionnariesTablePrefix =  MAIN_DB_PREFIX;
+		}
+
 		// Dictionnaries
 		if (! isset($conf->scrumboard->enabled)) {
 			$conf->scrumboard=new stdClass();
@@ -176,7 +183,7 @@ class modscrumboard extends DolibarrModules
 		$this->dictionnaries = array(
 			'langs' => 'scrumboard@scrumboard',
 			'tabname' => array(
-					MAIN_DB_PREFIX . 'c_scrum_columns'
+				$dictionnariesTablePrefix . 'c_scrum_columns'
 			),
 			'tablib' => array(
 					'ScrumManageColumns'
