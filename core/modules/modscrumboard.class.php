@@ -63,7 +63,12 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.3.7';
+
+		$this->version = '2.4.0';
+		// Url to the file with your last numberversion of this module
+		require_once __DIR__ . '/../../class/techatm.class.php';
+		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
+
 		// Key used in llx_const table to save module status enabled/disabled
 		// (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
