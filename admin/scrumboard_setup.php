@@ -83,17 +83,17 @@ llxHeader('','Gestion de scrumboard, à propos','');
 
 // Configuration header
 $head = scrumboardAdminPrepareHead();
-dol_fiche_head(
+print dol_get_fiche_head(
 	$head,
 	'settings',
 	$langs->trans("Module104210Name"),
 	0,
-	"scrumboard@scrumboard"
+	"module.svg@scrumboard"
 );
 
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
-print_fiche_titre('Scrumboard',$linkback,'setup');
+print load_fiche_titre('Scrumboard',$linkback,'setup');
 
 showParameters();
 

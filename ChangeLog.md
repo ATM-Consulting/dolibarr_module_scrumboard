@@ -1,6 +1,12 @@
 
 
 ## NOT RELEASED
+
+
+
+## 2.4
+
+- FIX : Module icon *13/07/2022* 2.4.1
 - NEW : Ajout de la class TechATM pour l'affichage de la page "A propos" *11/05/2022* 2.4.0
 
 ## 2.3
