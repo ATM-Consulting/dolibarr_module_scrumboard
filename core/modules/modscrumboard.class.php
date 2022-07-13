@@ -64,7 +64,8 @@ class modscrumboard extends DolibarrModules
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
 
-		$this->version = '2.4.0';
+		$this->version = '2.4.2';
+
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -80,7 +81,7 @@ class modscrumboard extends DolibarrModules
 		// use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png
 		// use this->picto='pictovalue@module'
-		$this->picto = 'scrumboard@scrumboard'; // mypicto@scrumboard
+		$this->picto = 'module.svg@scrumboard'; // mypicto@scrumboard
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
 		// for default path (eg: /scrumboard/core/xxxxx) (0=disable, 1=enable)
 		// for specific path of parts (eg: /scrumboard/core/modules/barcode)
