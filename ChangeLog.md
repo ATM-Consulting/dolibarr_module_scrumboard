@@ -6,7 +6,8 @@
 
 ## 2.4
 
-- FIX : Compatibility V16 - Token and family - *12/07/2022* - 2.4.2
+- FIX : Compatibility V16 - replace Dictionnaries tabname *13/07/2022* - 2.4.3
+- FIX : Compatibility V16 - Token - *12/07/2022* - 2.4.2
 - FIX : Module icon *13/07/2022* 2.4.1
 - NEW : Ajout de la class TechATM pour l'affichage de la page "A propos" *11/05/2022* 2.4.0
 
