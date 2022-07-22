@@ -361,9 +361,13 @@
 	        $id_projet=$object->id;
 	    }
 	}
-	if (method_exists($object, 'fetch_thirdparty')) $object->fetch_thirdparty();
-	if (empty($object->societe) && !empty($object->thirdparty)) $object->societe = $object->thirdparty; // Rétrocompatibilité
-	if ($object->societe->id > 0)  $result=$object->societe->fetch($object->societe->id);
+	if (method_exists($object, 'fetch_thirdparty')) $resfetchthirdparty = $object->fetch_thirdparty();
+	if($resfetchthirdparty > 0) {
+		if (empty($object->societe) && !empty($object->thirdparty)) $object->societe = $object->thirdparty; // Rétrocompatibilité
+		if ($object->societe->id > 0) $result = $object->societe->fetch($object->societe->id);
+	} else {
+		$object->societe = new Societe($db);
+	}
 
 	if (!empty($id_projet)) $object->fetch_optionals();
 
@@ -524,7 +528,7 @@
         $morehtmlref.=$object->title;
         // Thirdparty
         $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ';
-        if ($object->thirdparty->id > 0)
+        if (isset($object->thirdparty->id) AND  $object->thirdparty->id > 0)
         {
             $morehtmlref .= $object->thirdparty->getNomUrl(1, 'project');
         }

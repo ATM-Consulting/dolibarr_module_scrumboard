@@ -378,7 +378,8 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	$task->aff_time = convertSecondToTime($task->duration_effective,$working_timespentoutputformat,$dayInSecond, $working_days_per_weeks);
 	$task->aff_planned_workload = convertSecondToTime($task->planned_workload,$working_timespentoutputformat,$dayInSecond, $working_days_per_weeks);
 
-	$task->long_description.='';
+	(empty($task->long_description)) ? $task->long_description='' : $task->long_description.='';
+
 	if(!empty($conf->global->SCRUM_SHOW_DATES_IN_DESCRIPTION)) {
 		if($task->date_start>0) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
 		if($task->date_end>0) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
@@ -395,11 +396,11 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	{
 		$ef = new ExtraFields($db);
 		$labels = $ef->fetch_name_optionals_label('projet_task');
-		$TTaskEFToShow = explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS);
+		if(!empty($conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS)) $TTaskEFToShow = explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS);
 
 		foreach ($task->array_options as $key => $value)
 		{
-			if (in_array(str_replace('options_', '', $key), $TTaskEFToShow)) $task->options_display .= "<p>" . $labels[str_replace('options_', '', $key)] . ' : ' . $ef->showOutputField(str_replace('options_', '', $key), $value, '', 'projet_task')."</p>";
+			if (!empty($TTaskEFToShow) && in_array(str_replace('options_', '', $key), $TTaskEFToShow)) $task->options_display .= "<p>" . $labels[str_replace('options_', '', $key)] . ' : ' . $ef->showOutputField(str_replace('options_', '', $key), $value, '', 'projet_task')."</p>";
 		}
 
 	}
