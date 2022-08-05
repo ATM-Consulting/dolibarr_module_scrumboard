@@ -49,7 +49,7 @@ function scrumboardAdminPrepareHead()
     //$this->tabs = array(
     //	'entity:-tabname:Title:@scrumboard:/scrumboard/mypage.php?id=__ID__'
     //); // to remove a tab
-    complete_head_from_modules($conf, $langs, $object, $head, $h, 'scrumboard');
+    complete_head_from_modules($conf, $langs, new stdClass(), $head, $h, 'scrumboard');
 
     return $head;
 }
@@ -457,7 +457,7 @@ function _get_delivery_date_with_velocity(&$db, &$task, $velocity, $time=null) {
 
 		if(is_null($time)) {
 			$time = time();
-			if($time<$task->start_date)$time = $task->start_date;
+			if(!empty($task->start_date) && $time<$task->start_date)$time = $task->start_date;
 		}
 
 		$time += ( 86400 * $rest / $velocity  )  ;

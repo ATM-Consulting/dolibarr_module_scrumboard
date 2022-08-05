@@ -6,6 +6,7 @@
 
 ## 2.4
 
+- FIX : Compatibility PHP8 *05/08/2022* - 2.4.4
 - FIX : Compatibility V16 - fix warnings *22/07/2022* - 2.4.4
 - FIX : Compatibility V16 - replace Dictionnaries tabname *13/07/2022* - 2.4.3
 - FIX : Compatibility V16 - Token - *12/07/2022* - 2.4.2
