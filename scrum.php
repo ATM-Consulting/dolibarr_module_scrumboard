@@ -675,6 +675,7 @@
 	$scrumboardColumn = new ScrumboardColumn;
 	$TColumn = $scrumboardColumn->getTColumnOrder();
 	$nbColumns = count($TColumn);
+
 ?>
 <link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',1) ?>">
 
