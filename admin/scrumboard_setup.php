@@ -213,7 +213,7 @@ function showParameters() {
 	print '<form method="POST" name="display_EF">';
     print '<input type="hidden" name="token" value="'.$newToken.'">';
     print '<input type="hidden" name="action" value="set_SCRUM_DISPLAY_TASKS_EXTRAFIELDS">';
-	print $html->multiselectarray('SCRUM_DISPLAY_TASKS_EXTRAFIELDS', $labels, explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS), '', '', '', '', '300');
+	print $html->multiselectarray('SCRUM_DISPLAY_TASKS_EXTRAFIELDS', $labels, !empty($conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS) ? explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS):array(), '', '', '', '', '300');
 	print '<input class="button" type="submit" value="'.$langs->trans('Save').'">';
 	print '</form>';
 	print '</td></tr>';
