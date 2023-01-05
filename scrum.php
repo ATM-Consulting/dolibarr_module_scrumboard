@@ -612,6 +612,7 @@
 
 		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" id="scrum_filter_by_user">';
 		echo '<input name="id" value="'.$id_projet.'" type="hidden" />';
+		echo '<input type="hidden" name="token" value="' . newToken() . '">';
 
 		print '<table class="border" width="100%">';
 

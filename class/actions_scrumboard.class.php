@@ -1,72 +1,73 @@
 <?php
 class ActionsScrumboard
-{ 
-     /** Overloading the doActions function : replacing the parent's function with the one below 
-      *  @param      parameters  meta datas of the hook (context, etc...) 
-      *  @param      object             the object you want to process (an invoice if you are in invoice module, a propale in propale's module, etc...) 
-      *  @param      action             current action (if set). Generally create or edit or null 
-      *  @return       void 
+{
+     /** Overloading the doActions function : replacing the parent's function with the one below
+      *  @param      parameters  meta datas of the hook (context, etc...)
+      *  @param      object             the object you want to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
+      *  @param      action             current action (if set). Generally create or edit or null
+      *  @return       void
       */
-      
-    function formObjectOptions($parameters, &$object, &$action, $hookmanager) 
-    {  
+
+    function formObjectOptions($parameters, &$object, &$action, $hookmanager)
+    {
       	global $langs,$db;
-		
-		if (in_array('ordercard',explode(':',$parameters['context']))) 
+
+		if (in_array('ordercard',explode(':',$parameters['context'])))
         {
-        	
+
 		}
-		
+
 		return 0;
 	}
-     
-    function formEditProductOptions($parameters, &$object, &$action, $hookmanager) 
+
+    function formEditProductOptions($parameters, &$object, &$action, $hookmanager)
     {
-		
+
     	if (in_array('invoicecard',explode(':',$parameters['context'])))
         {
-        	
+
         }
-		
+
         return 0;
     }
 
 	function formAddObjectLine ($parameters, &$object, &$action, $hookmanager) {
-		
+
 		global $db;
-		
-		if (in_array('ordercard',explode(':',$parameters['context'])) || in_array('invoicecard',explode(':',$parameters['context']))) 
+
+		if (in_array('ordercard',explode(':',$parameters['context'])) || in_array('invoicecard',explode(':',$parameters['context'])))
         {
-        	
+
         }
 
 		return 0;
 	}
 
 	function printObjectLine ($parameters, &$object, &$action, $hookmanager){
-		
+
 		global $db;
-		
-		if (in_array('ordercard',explode(':',$parameters['context'])) || in_array('invoicecard',explode(':',$parameters['context']))) 
+
+		if (in_array('ordercard',explode(':',$parameters['context'])) || in_array('invoicecard',explode(':',$parameters['context'])))
         {
-        	
+
         }
 
 		return 0;
 	}
-	
+
 	function doActions ($parameters, &$object, &$action, $hookmanager){
-		
+
 		global $db, $conf, $user, $langs;
-		
+
 		$TContext = explode(':',$parameters['context']);
-		if (in_array('projecttaskcard',$TContext) )
+
+		if (in_array('projecttasktime',$TContext) )
 		{
 			if ($action == 'addtimespent' && $user->rights->projet->lire && !empty($conf->global->SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT))
 			{
 				$action = 'addtimespent_scrumboard';
 				$error=0;
-				
+
 				$timespent_durationhour = (double) GETPOST('timespent_durationhour','int');
 				$timespent_durationmin = (double) GETPOST('timespent_durationmin','int');
 				if (empty($timespent_durationhour) && empty($timespent_durationmin))
@@ -80,7 +81,7 @@ class ActionsScrumboard
 					setEventMessages($langs->trans('ErrorUserNotAssignedToTask'), null, 'errors');
 					$error++;
 				}
-				
+
 				if (! $error)
 				{
 					$object = new Task($db);
@@ -88,7 +89,7 @@ class ActionsScrumboard
 					if ($object->id > 0)
 					{
 						$object->fetch_projet();
-						
+
 						$object->timespent_note = GETPOST('timespent_note');
 						$object->progress = GETPOST('progress', 'int');
 						$object->timespent_duration = $timespent_durationhour*60*60;	// We store duration in seconds
@@ -119,14 +120,14 @@ class ActionsScrumboard
 				{
 					$action='';
 				}
-				
-					
+
+
 			}
 		}
-				
+
 		return 0;
 	}
-	
-	
-	
+
+
+
 }
