@@ -2,7 +2,9 @@
 
 ## NOT RELEASED
 
+##2.5
 
+- FIX : Compatibilité v16 qui n'avait pas été corrigé + correctif suite à changement du nom du hook "projecttasktime" pour la configuration qui permet d'ajouter des temps même si le projet est brouillon - 05/01/2023* - 2.5.0
 
 ## 2.4
 

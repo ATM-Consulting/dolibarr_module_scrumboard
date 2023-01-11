@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.4.5';
+		$this->version = '2.5.0';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -100,7 +100,7 @@ class modscrumboard extends DolibarrModules
 			// Set this to relative path of css if module has its own css file
 			//'css' => '/scrumboard/css/mycss.css.php',
 			// Set here all hooks context managed by module
-			'hooks' => array('projecttaskcard')
+			'hooks' => array('projecttaskcard', 'projecttasktime')
 			// Set here all workflow context managed by module
 			//'workflow' => array('order' => array('WORKFLOW_ORDER_AUTOCREATE_INVOICE'))
 		);
