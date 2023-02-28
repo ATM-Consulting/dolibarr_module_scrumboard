@@ -5,7 +5,7 @@
 
 
 ## 2.5
-
+- FIX : Compatibilité => ShowInputField() a besoin du paramètre $extrafieldsobjectkey - 28/02/2023* - 2.5.1
 - FIX : Compatibilité v16 qui n'avait pas été corrigé  - 05/01/2023* - 2.5.0  
     et ajout correctif suite à changement du nom du hook "projecttasktime" pour la configuration qui permet d'ajouter des temps même si le projet est brouillon
 

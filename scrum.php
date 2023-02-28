@@ -1279,7 +1279,7 @@ function _printExtrafieldsFilter()
 				echo '<tr><td>';
 				echo $extrafieldstask->attributes[$task->table_element]['label'][$key];
 				echo '</td><td>';
-				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_');
+				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_', '', '', $task->table_element);
 				echo '</td></tr>';
 			}
 		}
