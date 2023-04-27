@@ -612,7 +612,7 @@
 
 		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" id="scrum_filter_by_user">';
 		echo '<input name="id" value="'.$id_projet.'" type="hidden" />';
-		echo '<input type="hidden" name="token" value="' . newToken() . '">';
+		echo '<input type="hidden" name="token" value="' . $newToken . '">';
 
 		print '<table class="border" width="100%">';
 
@@ -643,6 +643,7 @@
 	else{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" id="scrum_filter_by_user">';
 		echo '<input name="id" value="'.$id_projet.'" type="hidden" />';
+		echo '<input type="hidden" name="token" value="' . $newToken . '">';
 
 		print '<table class="border" width="100%">';
 		if (empty($conf->global->SCRUMBOARD_HIDE_VELOCITY))
@@ -842,8 +843,8 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 
     			    print '<div id="form-add-ressource-story-'.$storyToEdit->id.'" >';
-                    print '<input type="hidden" name="token" value="'.$newToken.'">';
                     print '<form  action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+                    print '<input type="hidden" name="token" value="'.$newToken.'">';
     			    print '<input type="hidden" name="id" value="'.$id_projet.'" />';
     			    print '<input type="hidden" name="action" value="addcontact" />';
     			    print '<input type="hidden" name="id_story" value="'.$storie_k.'" />';
@@ -1279,7 +1280,7 @@ function _printExtrafieldsFilter()
 				echo '<tr><td>';
 				echo $extrafieldstask->attributes[$task->table_element]['label'][$key];
 				echo '</td><td>';
-				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_');
+				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_', '', '', $task->table_element);
 				echo '</td></tr>';
 			}
 		}
