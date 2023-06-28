@@ -5,6 +5,7 @@
 
 
 ## 2.5
+- FIX : Compat v18 - *23/06/2023* - 2.5.3
 - FIX : DA023325 - CSRF error on general scrumboard - *27/04/2023* - 2.5.2
 - FIX : Compatibilité => ShowInputField() a besoin du paramètre $extrafieldsobjectkey - *28/02/2023* - 2.5.1
 - FIX : Compatibilité v16 qui n'avait pas été corrigé  - *05/01/2023* - 2.5.0  
