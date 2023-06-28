@@ -63,10 +63,16 @@ function scrum_getVelocity(&$db, $id_project) {
 	$projet->fetch($id_project);
 
 	if($projet->date_start>$t2week) $t2week = $projet->date_start;
-
-	$res=$db->query("SELECT SUM(tt.task_duration) as task_duration
-	FROM ".MAIN_DB_PREFIX."projet_task_time tt LEFT JOIN ".MAIN_DB_PREFIX."projet_task t ON (tt.fk_task=t.rowid)
-	WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
+	if(version_compare('18.0.0', DOL_VERSION, '<')) {
+		$res = $db->query("SELECT SUM(tt.task_duration) as task_duration
+		FROM ".MAIN_DB_PREFIX."projet_task_time tt LEFT JOIN ".MAIN_DB_PREFIX."projet_task t ON (tt.fk_task=t.rowid)
+		WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
+	}
+	else {
+		$res = $db->query('SELECT SUM(tt.element_duration) as task_duration
+		FROM '.MAIN_DB_PREFIX.'element_time tt LEFT JOIN '.MAIN_DB_PREFIX."projet_task t ON (t.rowid=tt.fk_element AND tt.elementtype = 'task')
+		WHERE tt.element_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
+	}
 
 	$velocity = 0;
 	if($obj=$db->fetch_object($res)) {
@@ -348,10 +354,8 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	if(!empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK) && method_exists($task, 'getNbComments')) {
 		$task->nbcomment = $task->getNbComments();
 	}
-
 	$task->date_delivery = 0;
 	if($task->date_end >0 && $task->planned_workload>0) {
-
 		$velocity = scrum_getVelocity($db, $task->fk_project);
 		$task->date_delivery = _get_delivery_date_with_velocity($db, $task, $velocity);
 
