@@ -54,6 +54,11 @@ function scrumboardAdminPrepareHead()
     return $head;
 }
 
+/**
+ * @param $db
+ * @param $id_project
+ * @return float|int
+ */
 function scrum_getVelocity(&$db, $id_project) {
 	global $conf;
 
@@ -69,8 +74,10 @@ function scrum_getVelocity(&$db, $id_project) {
 	WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
 
 	$velocity = 0;
-	if($obj=$db->fetch_object($res)) {
+	if($res && $obj=$db->fetch_object($res)) {
 		 $velocity = round($obj->task_duration / ((time() - $t2week) / 86400));
+	}elseif(!$res){
+		error_log("scrum_getVelocity sql fail : ".$db->error());
 	}
 
 	if($velocity==0)$velocity = (int)$conf->global->SCRUM_DEFAULT_VELOCITY * 3600;
