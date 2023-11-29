@@ -371,7 +371,7 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 //    $timespentoutputformat='all';
 //    if (! empty($conf->global->PROJECT_TIMES_SPENT_FORMAT)) $timespentoutputformat=$conf->global->PROJECT_TIME_SPENT_FORMAT;
 	$working_timespentoutputformat='all';
-	if (getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT')) $working_timespentoutputformat = getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT'));
+	if (getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT')) $working_timespentoutputformat = getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT');
 
 	$working_days_per_weeks=7;
 	$dayInSecond = 86400;
