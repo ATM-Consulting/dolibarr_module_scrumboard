@@ -39,13 +39,13 @@
 	if((float) DOL_VERSION == 6.0) {
 		$TArrayOfCss[] = '/theme/common/fontawesome/css/font-awesome.css';
 	}
-	if(!empty($conf->global->SCRUM_SHOW_DATES)) {
+	if(getDolGlobalString('SCRUM_SHOW_DATES')) {
 		$TArrayOfCssClasses[] = 'withDatesOnTasks';
 	}
 
 
 
-	if (GETPOST('submitAction') === 'getCSV' && $user->rights->scrumboard->export) {
+	if (GETPOST('submitAction') === 'getCSV' && $user->hasRight('scrumboard', 'export')) {
 
 		$projectId = intval(GETPOST('id', 'int'));
 		$task = new Task($db);
@@ -289,7 +289,7 @@
 				$labelFilter,
 				$countryFilter,
 				$stateFilter);
-			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (! empty($conf->global->EXPORT_CSV_SEPARATOR_TO_USE)?$conf->global->EXPORT_CSV_SEPARATOR_TO_USE:';'));
+			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (getDolGlobalString('EXPORT_CSV_SEPARATOR_TO_USE')?$conf->global->EXPORT_CSV_SEPARATOR_TO_USE:';'));
 		}
 
 		$fileName = stream_get_meta_data($csvFileHandle)['uri'];
@@ -374,7 +374,7 @@
 	if($id_projet>0) {
 
 	    // Add new contact
-	    if ($action == 'addcontact' && $user->rights->projet->creer)
+	    if ($action == 'addcontact' && $user->hasRight('projet', 'creer'))
 	    {
 	        $contactsofproject=$object->getListContactId('internal');
 	        $idfortaskuser=GETPOST('userid','int');
@@ -452,7 +452,7 @@
 	else{
 		$head=array(0=>array(dol_buildpath('/scrumboard/scrum.php', 1), $langs->trans("Scrumboard"), 'scrumboard'));
 
-		if ($action == 'addcontact' && $user->rights->projet->creer)
+		if ($action == 'addcontact' && $user->hasRight('projet', 'creer'))
 		{
 			$idfortaskuser=GETPOST('userid','int');
 			$typeForTask = GETPOST('typeForTask','int');
@@ -591,7 +591,7 @@
 		print '<div class="underbanner clearboth"></div>';
 		print '<table class="border" width="100%">';
 
-		if(!empty($conf->global->SCRUM_SHOW_DESCRIPTION_IN_TASK)) {
+		if(getDolGlobalString('SCRUM_SHOW_DESCRIPTION_IN_TASK')) {
 			// Description mode if conf activ
 			print '<tr><td>'.$langs->trans("showDescriptionInTask").'</td>';
 			print '<td>';
@@ -628,7 +628,7 @@
 
 		echo '<div class="tabsAction">'
 			 . '<input type="submit" name="submitAction" value="' . $langs->trans('Filter') . '" class="butAction" />';
-		if ($user->rights->scrumboard->export) {
+		if ($user->hasRight('scrumboard', 'export')) {
 			echo '<button type="submit" name="submitAction" value="getCSV" formtarget="_blank" title="' . $langs->trans('ExportCSVHelp') . '" class="butAction">'
 			     . $langs->trans('ExportCSV')
 			     . '</button>';
@@ -646,7 +646,7 @@
 		echo '<input type="hidden" name="token" value="' . $newToken . '">';
 
 		print '<table class="border" width="100%">';
-		if (empty($conf->global->SCRUMBOARD_HIDE_VELOCITY))
+		if (!getDolGlobalString('SCRUMBOARD_HIDE_VELOCITY'))
 		{
 			echo '<tr><td>';
 			echo $langs->trans('CurrentVelocity');
@@ -663,7 +663,7 @@
 		print '</table>';
 
 		echo '<div class="tabsAction"><input type="submit" value="'.$langs->trans('Filter').'" class="butAction" />';
-		if ($user->rights->scrumboard->export) {
+		if ($user->hasRight('scrumboard', 'export')) {
 			echo '<button type="submit" name="submitAction" value="getCSV" formtarget="_blank" title="' . $langs->trans('ExportCSVHelp') . '" class="butAction">'
 				 . $langs->trans('ExportCSV')
 				 . '</button>';
@@ -934,7 +934,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 					if($id_projet > 0)
 					{
-						if(!empty($conf->global->SCRUM_SHOW_LINKED_CONTACT)){
+						if(getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')){
 					   		print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=addressourcetostorie#form-add-ressource-story-'.$storie_k.'"><i class="fa fa-user-plus"></i></a>';
 						}
 						print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=edit">'.img_picto($langs->trans('Modify'), 'edit.png').'</a>';
@@ -988,7 +988,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 	{
 		print '<div class="tabsAction">';
 
-		if ($user->rights->projet->all->creer || $user->rights->projet->creer)
+		if ($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer'))
 		{
 			if ($object->public || $object->restrictedProjectArea($user,'write') > 0)
 			{
@@ -1001,7 +1001,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 		}
 
 		if( (float)DOL_VERSION > 3.4 ) {
-			if ($user->rights->projet->all->creer || $user->rights->projet->creer)
+			if ($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer'))
 			{
 				if ($object->public || $object->restrictedProjectArea($user,'write') > 0)
 				{
@@ -1010,7 +1010,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 			}
 		}
 
-		if (($user->rights->projet->all->creer || $user->rights->projet->creer))
+		if (($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer')))
 		{
 			if ($object->public || $object->restrictedProjectArea($user,'write') > 0)
 			{
@@ -1070,7 +1070,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 							</div>
 							<?php
 							// Méthodes sur les commentaires ajoutées en standard depuis la 7.0
-							if(!empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK) && method_exists('Task', 'fetchComments')) {
+							if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK') && method_exists('Task', 'fetchComments')) {
 							?>
 							<div class="task-comment"><?php echo img_picto('', 'object_comment@scrumboard') ?><span></span></div>
 							<?php
@@ -1079,7 +1079,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 							<div class="task-origin"><a title="<?php echo $langs->trans('OriginFile'); ?>"><i style="color: black;" class="fa fa-link fa-lg"></i></a></div>
 
 							<?php
-							if(!empty($conf->global->SCRUM_SHOW_LINKED_CONTACT)){
+							if(getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')){
 							   print '<div class="task-add-contact" ><a ><i style="color: black;" class="fa fa-user-plus"></i> '.$langs->trans('LinkContact').'</a></div>';
 							}
 							?>
@@ -1158,7 +1158,7 @@ function _printUserFilter($id_projet, $form)
 {
 	global $conf, $langs, $user;
 
-	if (!empty($conf->global->SCRUM_FILTER_BY_USER_ENABLE))
+	if (getDolGlobalString('SCRUM_FILTER_BY_USER_ENABLE'))
 	{
 		echo '<tr><td>';
 		echo $langs->trans('UserFilter');
@@ -1166,7 +1166,7 @@ function _printUserFilter($id_projet, $form)
 		$fk_user = GETPOST('fk_user');
 		if (empty($id_projet) && empty($fk_user)) $fk_user = $user->id; // Si on selectionne vide dans le champ on aura -1
 
-		if (empty($id_projet) && empty($user->rights->projet->all->lire) && $conf->global->GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS) // filtrage du scrumboard global sur le user courant si pas le droit de tout voir
+		if (empty($id_projet) && !$user->hasRight('projet', 'all', 'lire') && $conf->global->GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS) // filtrage du scrumboard global sur le user courant si pas le droit de tout voir
 		{
 			echo "<input type='hidden' name='fk_user' value='".$user->id."'>";
 			echo $user->getNomUrl(1);
@@ -1225,7 +1225,7 @@ function _printStateFilter($form)
     global $langs, $conf;
 
     $formcompany = new FormCompany($form->db);
-    if (!empty($conf->global->SOCIETE_DISABLE_STATE)) return;
+    if (getDolGlobalString('SOCIETE_DISABLE_STATE')) return;
     dol_include_once('/core/lib/company.lib.php');
 
     $state_id = dol_escape_htmltag(GETPOST('state_id'));

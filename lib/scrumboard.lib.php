@@ -159,7 +159,7 @@ function getSQLForTasks(
 		$sql.= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_storie ps ON (ps.fk_projet = pt.fk_projet AND ps.storie_order = pt.story_k)';
 	}
 
-	if (!empty($conf->global->SCRUM_FILTER_BY_USER_ENABLE) && $fk_user > 0)
+	if (getDolGlobalString('SCRUM_FILTER_BY_USER_ENABLE') && $fk_user > 0)
 	{
 		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'element_contact ec ON (ec.element_id = pt.rowid)';
 		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'c_type_contact tc ON (tc.rowid = ec.fk_c_type_contact)';
@@ -187,7 +187,7 @@ function getSQLForTasks(
 
 	if($id_project > 0) $sql.= ' AND fk_projet='.$id_project;
 
-	if (!empty($conf->global->SCRUM_FILTER_BY_USER_ENABLE) && $fk_user > 0)
+	if (getDolGlobalString('SCRUM_FILTER_BY_USER_ENABLE') && $fk_user > 0)
 	{
 		$sql.= ' AND tc.element = \'project_task\' AND ec.fk_socpeople = '.$fk_user;
 	}
@@ -313,7 +313,7 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	$obj = $db->fetch_object($resql);
 
 	// Méthodes sur les commentaires ajoutées en standard depuis la 7.0
-	if(! empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK) && empty($task->comments) && method_exists($task, 'fetchComments')) $task->fetchComments();
+	if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK') && empty($task->comments) && method_exists($task, 'fetchComments')) $task->fetchComments();
 
 	if(! empty($obj)) {
 		$sourcetype = $obj->sourcetype;
@@ -358,7 +358,7 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	}
 
 	// Méthodes sur les commentaires ajoutées en standard depuis la 7.0
-	if(!empty($conf->global->PROJECT_ALLOW_COMMENT_ON_TASK) && method_exists($task, 'getNbComments')) {
+	if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK') && method_exists($task, 'getNbComments')) {
 		$task->nbcomment = $task->getNbComments();
 	}
 	$task->date_delivery = 0;
@@ -371,14 +371,14 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 //    $timespentoutputformat='all';
 //    if (! empty($conf->global->PROJECT_TIMES_SPENT_FORMAT)) $timespentoutputformat=$conf->global->PROJECT_TIME_SPENT_FORMAT;
 	$working_timespentoutputformat='all';
-	if (! empty($conf->global->PROJECT_WORKING_TIMES_SPENT_FORMAT)) $working_timespentoutputformat=$conf->global->PROJECT_WORKING_TIMES_SPENT_FORMAT;
+	if (getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT')) $working_timespentoutputformat=$conf->global->PROJECT_WORKING_TIMES_SPENT_FORMAT;
 
 	$working_days_per_weeks=7;
 	$dayInSecond = 86400;
-	if (!empty($conf->global->PROJECT_WORKING_HOURS_PER_DAY))
+	if (getDolGlobalString('PROJECT_WORKING_HOURS_PER_DAY'))
 	{
-		$working_days_per_weeks=!empty($conf->global->PROJECT_WORKING_DAYS_PER_WEEKS) ? $conf->global->PROJECT_WORKING_DAYS_PER_WEEKS : 5;
-		$working_hours_per_day=!empty($conf->global->PROJECT_WORKING_HOURS_PER_DAY) ? $conf->global->PROJECT_WORKING_HOURS_PER_DAY : 7;
+		$working_days_per_weeks=getDolGlobalString('PROJECT_WORKING_DAYS_PER_WEEKS') ? $conf->global->PROJECT_WORKING_DAYS_PER_WEEKS : 5;
+		$working_hours_per_day=getDolGlobalString('PROJECT_WORKING_HOURS_PER_DAY') ? $conf->global->PROJECT_WORKING_HOURS_PER_DAY : 7;
 		$working_hours_per_day_in_seconds = 3600 * $working_hours_per_day;
 		$dayInSecond = $working_hours_per_day_in_seconds;
 	}
@@ -391,23 +391,23 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 
 	(empty($task->long_description)) ? $task->long_description='' : $task->long_description.='';
 
-	if(!empty($conf->global->SCRUM_SHOW_DATES_IN_DESCRIPTION)) {
+	if(getDolGlobalString('SCRUM_SHOW_DATES_IN_DESCRIPTION')) {
 		if($task->date_start>0) $task->long_description .= $langs->trans('TaskDateStart').' : '.dol_print_date($task->date_start).'<br />';
 		if($task->date_end>0) $task->long_description .= $langs->trans('TaskDateEnd').' : '.dol_print_date($task->date_end).'<br />';
 		if($task->date_delivery>0 && $task->date_delivery>$task->date_end) $task->long_description .= $langs->trans('TaskDateShouldDelivery').' : '.dol_print_date($task->date_delivery).'<br />';
 	}
 	$task->long_description.=nl2br($task->description);
 
-	if (!empty($conf->global->SCRUM_SHOW_LINKED_CONTACT)) _getTContact($task);
+	if (getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')) _getTContact($task);
 
 	$task->formatted_date_start_end = '';
-	if (!empty($conf->global->SCRUM_SHOW_DATES)) $task->formatted_date_start_end = dol_print_date($task->date_start, 'day') . ' - ' . dol_print_date($task->date_end, 'day');
+	if (getDolGlobalString('SCRUM_SHOW_DATES')) $task->formatted_date_start_end = dol_print_date($task->date_start, 'day') . ' - ' . dol_print_date($task->date_end, 'day');
 
 	if (!empty($task->array_options))
 	{
 		$ef = new ExtraFields($db);
 		$labels = $ef->fetch_name_optionals_label('projet_task');
-		if(!empty($conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS)) $TTaskEFToShow = explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS);
+		if(getDolGlobalString('SCRUM_DISPLAY_TASKS_EXTRAFIELDS')) $TTaskEFToShow = explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS);
 
 		foreach ($task->array_options as $key => $value)
 		{
