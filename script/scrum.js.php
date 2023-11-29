@@ -89,7 +89,7 @@ function project_get_tasks(id_project, status) {
 			var l_status = status;
 			// Si on utilise la conf de backlog et review, il faut tester si le scrum_status est vide pour mettre la tache dans la colonne la plus à gauche par défaut (test à faire unique si conf activé sinon on perd les taches sans scrum_status si désactivé)
 			// TODO: Voir avec Geoffrey pour l'avenir de la conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN
-			if(status == 'todo' && (task.scrum_status =='backlog' <?php if (getDolGlobalString('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) echo '|| task.scrum_status == ""'; ?> ) ) {
+			if(status == 'todo' && (task.scrum_status =='backlog' <?php if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) echo '|| task.scrum_status == ""'; ?> ) ) {
 				l_status = 'backlog';
 			}
 			else if(status == 'finish' && task.scrum_status =='review' ) {
@@ -132,7 +132,7 @@ function project_create_task(id_project) {
 
 		<?php
 		// TODO: Conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN !
-					if(getDolGlobalString('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
+					if(getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
 						echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=backlog]\')';
 					}
 					else{
@@ -255,12 +255,12 @@ function project_refresh_task(id_project, task) {
 	else $item.find('.task-origin a').remove();
 
 	<?php
-	if(getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')){
+	if(getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')){
 	    print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id); ';
 	}
 	?>
 
-	<?php if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
+	<?php if(getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
 	<!--  Commentary conf -->
 	$item.find('.task-comment span').html(task.nbcomment).attr('task-id', task.id);
 
@@ -588,7 +588,7 @@ function pop_time(id_project, id_task) {
 				});
 }
 
-<?php if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
+<?php if(getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
 <!--  Commentary conf -->
 
 

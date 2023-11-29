@@ -39,7 +39,7 @@
 	if((float) DOL_VERSION == 6.0) {
 		$TArrayOfCss[] = '/theme/common/fontawesome/css/font-awesome.css';
 	}
-	if(getDolGlobalString('SCRUM_SHOW_DATES')) {
+	if(getDolGlobalInt('SCRUM_SHOW_DATES')) {
 		$TArrayOfCssClasses[] = 'withDatesOnTasks';
 	}
 
@@ -289,7 +289,7 @@
 				$labelFilter,
 				$countryFilter,
 				$stateFilter);
-			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (getDolGlobalString('EXPORT_CSV_SEPARATOR_TO_USE')?$conf->global->EXPORT_CSV_SEPARATOR_TO_USE:';'));
+			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (getDolGlobalInt('EXPORT_CSV_SEPARATOR_TO_USE')?$conf->global->EXPORT_CSV_SEPARATOR_TO_USE:';'));
 		}
 
 		$fileName = stream_get_meta_data($csvFileHandle)['uri'];
@@ -591,7 +591,7 @@
 		print '<div class="underbanner clearboth"></div>';
 		print '<table class="border" width="100%">';
 
-		if(getDolGlobalString('SCRUM_SHOW_DESCRIPTION_IN_TASK')) {
+		if(getDolGlobalInt('SCRUM_SHOW_DESCRIPTION_IN_TASK')) {
 			// Description mode if conf activ
 			print '<tr><td>'.$langs->trans("showDescriptionInTask").'</td>';
 			print '<td>';
@@ -646,7 +646,7 @@
 		echo '<input type="hidden" name="token" value="' . $newToken . '">';
 
 		print '<table class="border" width="100%">';
-		if (!getDolGlobalString('SCRUMBOARD_HIDE_VELOCITY'))
+		if (!getDolGlobalInt('SCRUMBOARD_HIDE_VELOCITY'))
 		{
 			echo '<tr><td>';
 			echo $langs->trans('CurrentVelocity');
@@ -934,7 +934,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 					if($id_projet > 0)
 					{
-						if(getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')){
+						if(getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')){
 					   		print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=addressourcetostorie#form-add-ressource-story-'.$storie_k.'"><i class="fa fa-user-plus"></i></a>';
 						}
 						print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=edit">'.img_picto($langs->trans('Modify'), 'edit.png').'</a>';
@@ -1070,7 +1070,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 							</div>
 							<?php
 							// Méthodes sur les commentaires ajoutées en standard depuis la 7.0
-							if(getDolGlobalString('PROJECT_ALLOW_COMMENT_ON_TASK') && method_exists('Task', 'fetchComments')) {
+							if(getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK') && method_exists('Task', 'fetchComments')) {
 							?>
 							<div class="task-comment"><?php echo img_picto('', 'object_comment@scrumboard') ?><span></span></div>
 							<?php
@@ -1079,7 +1079,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 							<div class="task-origin"><a title="<?php echo $langs->trans('OriginFile'); ?>"><i style="color: black;" class="fa fa-link fa-lg"></i></a></div>
 
 							<?php
-							if(getDolGlobalString('SCRUM_SHOW_LINKED_CONTACT')){
+							if(getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')){
 							   print '<div class="task-add-contact" ><a ><i style="color: black;" class="fa fa-user-plus"></i> '.$langs->trans('LinkContact').'</a></div>';
 							}
 							?>
@@ -1158,7 +1158,7 @@ function _printUserFilter($id_projet, $form)
 {
 	global $conf, $langs, $user;
 
-	if (getDolGlobalString('SCRUM_FILTER_BY_USER_ENABLE'))
+	if (getDolGlobalInt('SCRUM_FILTER_BY_USER_ENABLE'))
 	{
 		echo '<tr><td>';
 		echo $langs->trans('UserFilter');
@@ -1225,7 +1225,7 @@ function _printStateFilter($form)
     global $langs, $conf;
 
     $formcompany = new FormCompany($form->db);
-    if (getDolGlobalString('SOCIETE_DISABLE_STATE')) return;
+    if (getDolGlobalInt('SOCIETE_DISABLE_STATE')) return;
     dol_include_once('/core/lib/company.lib.php');
 
     $state_id = dol_escape_htmltag(GETPOST('state_id'));

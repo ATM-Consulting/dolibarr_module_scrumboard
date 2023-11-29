@@ -63,7 +63,7 @@ class ActionsScrumboard
 
 		if (in_array('projecttasktime',$TContext) )
 		{
-			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalString('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT'))
+			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT'))
 			{
 				$action = 'addtimespent_scrumboard';
 				$error=0;
