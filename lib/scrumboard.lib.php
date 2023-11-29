@@ -86,7 +86,7 @@ function scrum_getVelocity(&$db, $id_project) {
 		error_log("scrum_getVelocity sql fail : ".$db->error());
 	}
 
-	if($velocity==0)$velocity = (int)$conf->global->SCRUM_DEFAULT_VELOCITY * 3600;
+	if($velocity==0)$velocity = (int) getDolGlobalInt('SCRUM_DEFAULT_VELOCITY') * 3600;
 
 	return $velocity;
 }
@@ -371,19 +371,19 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 //    $timespentoutputformat='all';
 //    if (! empty($conf->global->PROJECT_TIMES_SPENT_FORMAT)) $timespentoutputformat=$conf->global->PROJECT_TIME_SPENT_FORMAT;
 	$working_timespentoutputformat='all';
-	if (getDolGlobalInt('PROJECT_WORKING_TIMES_SPENT_FORMAT')) $working_timespentoutputformat=$conf->global->PROJECT_WORKING_TIMES_SPENT_FORMAT;
+	if (getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT')) $working_timespentoutputformat = getDolGlobalString('PROJECT_WORKING_TIMES_SPENT_FORMAT'));
 
 	$working_days_per_weeks=7;
 	$dayInSecond = 86400;
 	if (getDolGlobalInt('PROJECT_WORKING_HOURS_PER_DAY'))
 	{
-		$working_days_per_weeks=getDolGlobalInt('PROJECT_WORKING_DAYS_PER_WEEKS') ? $conf->global->PROJECT_WORKING_DAYS_PER_WEEKS : 5;
-		$working_hours_per_day=getDolGlobalInt('PROJECT_WORKING_HOURS_PER_DAY') ? $conf->global->PROJECT_WORKING_HOURS_PER_DAY : 7;
+		$working_days_per_weeks=getDolGlobalInt('PROJECT_WORKING_DAYS_PER_WEEKS') ? getDolGlobalInt('PROJECT_WORKING_DAYS_PER_WEEKS') : 5;
+		$working_hours_per_day=getDolGlobalInt('PROJECT_WORKING_HOURS_PER_DAY') ? getDolGlobalInt('PROJECT_WORKING_HOURS_PER_DAY') : 7;
 		$working_hours_per_day_in_seconds = 3600 * $working_hours_per_day;
 		$dayInSecond = $working_hours_per_day_in_seconds;
 	}
-	elseif($conf->global->SCRUM_DEFAULT_VELOCITY){
-		$dayInSecond = 60*60*$conf->global->SCRUM_DEFAULT_VELOCITY;
+	else if(getDolGlobalInt('SCRUM_DEFAULT_VELOCITY')){
+		$dayInSecond = 60 * 60 * getDolGlobalInt('SCRUM_DEFAULT_VELOCITY');
 	}
 
 	$task->aff_time = convertSecondToTime($task->duration_effective,$working_timespentoutputformat,$dayInSecond, $working_days_per_weeks);
@@ -407,7 +407,7 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	{
 		$ef = new ExtraFields($db);
 		$labels = $ef->fetch_name_optionals_label('projet_task');
-		if(getDolGlobalInt('SCRUM_DISPLAY_TASKS_EXTRAFIELDS')) $TTaskEFToShow = explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS);
+		if(getDolGlobalString('SCRUM_DISPLAY_TASKS_EXTRAFIELDS')) $TTaskEFToShow = explode(',', getDolGlobalString('SCRUM_DISPLAY_TASKS_EXTRAFIELDS'));
 
 		foreach ($task->array_options as $key => $value)
 		{

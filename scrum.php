@@ -289,7 +289,7 @@
 				$labelFilter,
 				$countryFilter,
 				$stateFilter);
-			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (getDolGlobalInt('EXPORT_CSV_SEPARATOR_TO_USE')?$conf->global->EXPORT_CSV_SEPARATOR_TO_USE:';'));
+			$csvFileHandle = _getCSV($sql, $selectedColumns, $column->label, '', $csvFileHandle, (getDolGlobalInt('EXPORT_CSV_SEPARATOR_TO_USE') ? getDolGlobalString('EXPORT_CSV_SEPARATOR_TO_USE') : ';' ));
 		}
 
 		$fileName = stream_get_meta_data($csvFileHandle)['uri'];
@@ -1118,7 +1118,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 			<p><?php echo $langs->trans('ResetDateWithThisVelocity'); ?> : </p>
 
-			<input type="text" name="velocity" size="5" id="current-velocity" value="<?php echo $conf->global->SCRUM_DEFAULT_VELOCITY*3600; ?>" /> <?php echo $langs->trans('HoursPerDay') ?>
+			<input type="text" name="velocity" size="5" id="current-velocity" value="<?php echo getDolGlobalInt('SCRUM_DEFAULT_VELOCITY') * 3600; ?>" /> <?php echo $langs->trans('HoursPerDay') ?>
 
 		</div>
 		<div id="add-storie" title="<?php echo $langs->trans('AddStorie'); ?>" style="display:none;">
@@ -1166,7 +1166,7 @@ function _printUserFilter($id_projet, $form)
 		$fk_user = GETPOST('fk_user');
 		if (empty($id_projet) && empty($fk_user)) $fk_user = $user->id; // Si on selectionne vide dans le champ on aura -1
 
-		if (empty($id_projet) && !$user->hasRight('projet', 'all', 'lire') && $conf->global->GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS) // filtrage du scrumboard global sur le user courant si pas le droit de tout voir
+		if (empty($id_projet) && !$user->hasRight('projet', 'all', 'lire') && getDolGlobalInt('GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS')) // filtrage du scrumboard global sur le user courant si pas le droit de tout voir
 		{
 			echo "<input type='hidden' name='fk_user' value='".$user->id."'>";
 			echo $user->getNomUrl(1);
