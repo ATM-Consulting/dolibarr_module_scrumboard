@@ -3,6 +3,8 @@
 ## NOT RELEASED
 
 
+## 2.6
+- NEW : compat dolibarrV19 & PHP8.2 - *29/11/2023* - 2.6.0
 
 ## 2.5
 - FIX : PHP warning  - 26/07/2023* - 2.5.4
