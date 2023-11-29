@@ -1,5 +1,5 @@
 <?php
-class ActionsScrumboard
+class ActionsScrumboard extends CommonHookActions
 {
      /** Overloading the doActions function : replacing the parent's function with the one below
       *  @param      parameters  meta datas of the hook (context, etc...)
