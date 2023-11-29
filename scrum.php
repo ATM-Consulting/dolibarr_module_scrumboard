@@ -573,7 +573,7 @@
 		print '</td></tr>';
 
 		// Categories
-		if($conf->categorie->enabled) {
+		if(!empty($conf->categorie->enabled)) {
 			print '<tr><td valign="middle">'.$langs->trans("Categories").'</td><td>';
 			print $form->showCategories($object->id,'project',1);
 			print "</td></tr>";
