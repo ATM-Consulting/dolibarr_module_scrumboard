@@ -126,7 +126,7 @@ class Interfacescrumboardtrigger
 
 			global $conf,$dolibarr_main_db_host,$dolibarr_main_db_name,$dolibarr_main_db_pass,$dolibarr_main_db_user;
 
-			define('INC_FROM_DOLIBARR',true);
+            if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 			dol_include_once('/scrumboard/config.php');
 			dol_include_once('/scrumboard/class/scrumboard.class.php');
 			$PDOdb = new TPDOdb;
@@ -146,7 +146,7 @@ class Interfacescrumboardtrigger
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
-			define('INC_FROM_DOLIBARR',true);
+            if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
                         dol_include_once('/scrumboard/config.php');
 			dol_include_once('scrumboard/class/scrumboard.class.php');
 

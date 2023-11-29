@@ -483,7 +483,7 @@ class modscrumboard extends DolibarrModules
 	{
 		$sql = array();
 
-		define('INC_FROM_DOLIBARR',true);
+        if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 
 		dol_include_once('/scrumboard/config.php');
 		dol_include_once('/scrumboard/script/create-maj-base.php');
