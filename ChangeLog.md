@@ -4,9 +4,12 @@
 
 
 ## 2.6
-- NEW : compat dolibarrV19 & PHP8.2 - *29/11/2023* - 2.6.0
+
+- NEW :  Changed Dolibarr compatibility range to 12 min - 19 max  	- *29/11/2023* - 2.6.0
+  	 Changed PHP compatibility range to 7.0 min - 8.2 max 		- *29/11/2023* - 2.6.0
 
 ## 2.5
+
 - FIX : PHP warning  - 26/07/2023* - 2.5.4
 - FIX : Compat v18 - *23/06/2023* - 2.5.3
 - FIX : DA023325 - CSRF error on general scrumboard - *27/04/2023* - 2.5.2
