@@ -2,7 +2,7 @@
 
 ## NOT RELEASED
 
-- NEW :  Changed Dolibarr compatibility range to 12 min - 19 max  	- *29/11/2023* - 2.6.0  
+- NEW :  Changed Dolibarr compatibility range to 15 min - 19 max  	- *29/11/2023* - 2.6.0  
   	 Changed PHP compatibility range to 7.0 min - 8.2 max 
 
 ## 2.5
