@@ -5,7 +5,7 @@ if (!class_exists('TObjetStd'))
 	/**
 	 * Needed if $form->showLinkedObjectBlock() is call
 	 */
-	define('INC_FROM_DOLIBARR', true);
+    if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR', true);
 	require_once dirname(__FILE__).'/../config.php';
 }
 
@@ -53,7 +53,7 @@ class ScrumboardColumn extends TObjetStd
 	{
 		global $conf;
 		
-		if (!empty($conf->global->SCRUM_ADD_BACKLOG_REVIEW_COLUMN))
+		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN'))
 		{
 			if (empty($this->TColumn) || $force_load)
 			{
@@ -87,7 +87,7 @@ class ScrumboardColumn extends TObjetStd
 	{
 		global $conf;
 		
-		if (!empty($conf->global->SCRUM_ADD_BACKLOG_REVIEW_COLUMN))
+		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN'))
 		{
 			return !empty($this->TColumn[0]) ? $this->TColumn[0]->code : '';
 		}

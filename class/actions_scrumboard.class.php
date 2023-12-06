@@ -1,5 +1,8 @@
 <?php
-class ActionsScrumboard
+
+require_once __DIR__ . '/../backport/v19/core/class/commonhookactions.class.php';
+
+class ActionsScrumboard extends scrumboard\RetroCompatCommonHookActions
 {
      /** Overloading the doActions function : replacing the parent's function with the one below
       *  @param      parameters  meta datas of the hook (context, etc...)
@@ -63,7 +66,7 @@ class ActionsScrumboard
 
 		if (in_array('projecttasktime',$TContext) )
 		{
-			if ($action == 'addtimespent' && $user->rights->projet->lire && !empty($conf->global->SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT))
+			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT'))
 			{
 				$action = 'addtimespent_scrumboard';
 				$error=0;

@@ -119,7 +119,7 @@ function showParameters() {
 	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
 	print '<input type="hidden" name="token" value="'.$newToken.'">';
 	print '<input type="hidden" name="action" value="set_SCRUM_DEFAULT_VELOCITY">';
-	print '<input type="text" name="SCRUM_DEFAULT_VELOCITY" value="'.$conf->global->SCRUM_DEFAULT_VELOCITY.'" size="3" />&nbsp;';
+	print '<input type="text" name="SCRUM_DEFAULT_VELOCITY" value="' . getDolGlobalString('SCRUM_DEFAULT_VELOCITY').'" size="3" />&nbsp;';
 	print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 	print '</form>';
 	print '</td></tr>';
@@ -213,7 +213,7 @@ function showParameters() {
 	print '<form method="POST" name="display_EF">';
     print '<input type="hidden" name="token" value="'.$newToken.'">';
     print '<input type="hidden" name="action" value="set_SCRUM_DISPLAY_TASKS_EXTRAFIELDS">';
-	print $html->multiselectarray('SCRUM_DISPLAY_TASKS_EXTRAFIELDS', $labels, !empty($conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS) ? explode(',', $conf->global->SCRUM_DISPLAY_TASKS_EXTRAFIELDS):array(), '', '', '', '', '300');
+	print $html->multiselectarray('SCRUM_DISPLAY_TASKS_EXTRAFIELDS', $labels, getDolGlobalString('SCRUM_DISPLAY_TASKS_EXTRAFIELDS') ? explode(',', getDolGlobalString('SCRUM_DISPLAY_TASKS_EXTRAFIELDS')) : array(), '', '', '', '', '300');
 	print '<input class="button" type="submit" value="'.$langs->trans('Save').'">';
 	print '</form>';
 	print '</td></tr>';

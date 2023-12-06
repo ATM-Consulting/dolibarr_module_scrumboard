@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.5.4';
+		$this->version = '2.6.0';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -119,9 +119,9 @@ class modscrumboard extends DolibarrModules
 		// List of modules id to disable if this one is disabled
 		$this->requiredby = array();
 		// Minimum version of PHP required by module
-		$this->phpmin = array(5, 3);
+		$this->phpmin = array(7, 0);
 		// Minimum version of Dolibarr required by module
-		$this->need_dolibarr_version = array(3, 2);
+		$this->need_dolibarr_version = array(15, 0);
 		$this->langfiles = array("scrumboard@scrumboard"); // langfiles@scrumboard
 		// Constants
 		// List of particular constants to add when module is enabled
@@ -483,7 +483,7 @@ class modscrumboard extends DolibarrModules
 	{
 		$sql = array();
 
-		define('INC_FROM_DOLIBARR',true);
+        if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 
 		dol_include_once('/scrumboard/config.php');
 		dol_include_once('/scrumboard/script/create-maj-base.php');
