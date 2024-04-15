@@ -135,9 +135,13 @@
 		// adapted from Extrafields::showOutputField() (we can't use it directly as it outputs HTML, not plain text)
 		if (is_array($extralabels)) {
 			foreach ($extralabels as $key => $label) {
-				$extrafieldType = $extrafields->attribute_type[$key];
-				$extrafieldParam = $extrafields->attribute_param[$key];
-//				var_dump($key, $extrafieldType);
+                if(floatval(DOL_VERSION) >= 17) {
+                    $extrafieldType = $extrafields->attributes[$task->table_element]['type'][$key];
+                    $extrafieldParam = $extrafields->attributes[$task->table_element]['param'][$key];
+                } else {
+                    $extrafieldType = $extrafields->attribute_type[$key];
+                    $extrafieldParam = $extrafields->attribute_param[$key];
+                }
 				switch ($extrafieldType) {
 					case 'date':
 						$callback = function (&$obj) use ($key) {

@@ -411,6 +411,7 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 
 		foreach ($task->array_options as $key => $value)
 		{
+            if(empty($task->options_display)) $task->options_display = '';
 			if (!empty($TTaskEFToShow) && in_array(str_replace('options_', '', $key), $TTaskEFToShow)) $task->options_display .= "<p>" . $labels[str_replace('options_', '', $key)] . ' : ' . $ef->showOutputField(str_replace('options_', '', $key), $value, '', 'projet_task')."</p>";
 		}
 
