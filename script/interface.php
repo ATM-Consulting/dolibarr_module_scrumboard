@@ -202,7 +202,6 @@ function _tasks(&$db, $id_project, $status, $fk_user, $fk_soc, $soc_type, $TDate
 	}
 
 	$TTask = array();
-
 	if($status == 'unknownColumn') {
 		$scrumboardColumn = new ScrumboardColumn;
 		$PDOdb=new TPDOdb;
