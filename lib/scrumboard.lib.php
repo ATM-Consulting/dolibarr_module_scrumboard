@@ -178,7 +178,7 @@ function getSQLForTasks(
 		if (!empty($status)) {
 			$sql.= ' AND ((scrum_status IS NOT NULL AND scrum_status = "'.$db->escape($status).'")';
 			if      ($status=='ideas')      $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL) AND datee IS NULL)';
-			else if ($status=='todo')       $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL))';
+			else if ($status=='todo' || getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN') && $status=='backlog')  $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL))';
 			else if ($status=='inprogress') $sql.= ' OR (scrum_status IS NULL AND  progress > 0 AND progress < 100)';
 			else if ($status=='finish')     $sql.= ' OR (scrum_status IS NULL AND  progress=100)';
 			$sql .= ')';
