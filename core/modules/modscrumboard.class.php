@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.6.2';
+		$this->version = '2.7.0';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -121,7 +121,7 @@ class modscrumboard extends DolibarrModules
 		// Minimum version of PHP required by module
 		$this->phpmin = array(7, 0);
 		// Minimum version of Dolibarr required by module
-		$this->need_dolibarr_version = array(15, 0);
+		$this->need_dolibarr_version = array(16, 0);
 		$this->langfiles = array("scrumboard@scrumboard"); // langfiles@scrumboard
 		// Constants
 		// List of particular constants to add when module is enabled
@@ -180,7 +180,7 @@ class modscrumboard extends DolibarrModules
 		}
 
 		// Dictionnaries
-		if (! isset($conf->scrumboard->enabled)) {
+		if (!isModEnabled('scrumboard')) {
 			$conf->scrumboard=new stdClass();
 			$conf->scrumboard->enabled = 0;
 		}
@@ -211,12 +211,12 @@ class modscrumboard extends DolibarrModules
 					'rowid'
 			),
 			'tabcond' => array(
-					'$conf->scrumboard->enabled' // TODO ?? -> && $conf->global->SCRUM_ADD_BACKLOG_REVIEW_COLUMN
+					"isModEnabled('scrumboard')" // TODO ?? -> && $conf->global->SCRUM_ADD_BACKLOG_REVIEW_COLUMN
 			)
 		);
 		/* Example:
 		  // This is to avoid warnings
-		  if (! isset($conf->scrumboard->enabled)) $conf->scrumboard->enabled=0;
+		  if (! isset(isModEnabled('scrumboard'))) isModEnabled('scrumboard')=0;
 		  $this->dictionnaries=array(
 		  'langs'=>'scrumboard@scrumboard',
 		  // List of tables we want to see into dictonnary editor
@@ -248,9 +248,9 @@ class modscrumboard extends DolibarrModules
 		  'tabrowid'=>array("rowid","rowid","rowid"),
 		  // Condition to show each dictionnary
 		  'tabcond'=>array(
-		  $conf->scrumboard->enabled,
-		  $conf->scrumboard->enabled,
-		  $conf->scrumboard->enabled
+		  isModEnabled('scrumboard'),
+		  isModEnabled('scrumboard'),
+		  isModEnabled('scrumboard')
 		  )
 		  );
 		 */
@@ -293,7 +293,7 @@ class modscrumboard extends DolibarrModules
 			'perms'=>'1', // Use 'perms'=>'$user->rights->report->level1->level2' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
-			'enabled'=>'$conf->scrumboard->enabled && $conf->global->SCRUM_USE_GLOBAL_BOARD'
+			'enabled'=>'isModEnabled("scrumboard") && $conf->global->SCRUM_USE_GLOBAL_BOARD'
 		);
 		$r++;
 
@@ -314,8 +314,8 @@ class modscrumboard extends DolibarrModules
 		//	'langs'=>'mylangfile',
 		//	'position'=>100,
 		//	// Define condition to show or hide menu entry.
-		//	// Use '$conf->scrumboard->enabled' if entry must be visible if module is enabled.
-		//	'enabled'=>'$conf->scrumboard->enabled',
+		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
+		//	'enabled'=>"isModEnabled('scrumboard')",
 		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',
@@ -339,8 +339,8 @@ class modscrumboard extends DolibarrModules
 		//	'langs'=>'mylangfile',
 		//	'position'=>100,
 		//	// Define condition to show or hide menu entry.
-		//	// Use '$conf->scrumboard->enabled' if entry must be visible if module is enabled.
-		//	'enabled'=>'$conf->scrumboard->enabled',
+		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
+		//	'enabled'=>"isModEnabled('scrumboard')",
 		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',
@@ -365,9 +365,9 @@ class modscrumboard extends DolibarrModules
 		//	'langs'=>'mylangfile',
 		//	'position'=>100,
 		//	// Define condition to show or hide menu entry.
-		//	// Use '$conf->scrumboard->enabled' if entry must be visible if module is enabled.
+		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
 		//	// Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		//	'enabled'=>'$conf->scrumboard->enabled',
+		//	'enabled'=>"isModEnabled('scrumboard')",
 		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',

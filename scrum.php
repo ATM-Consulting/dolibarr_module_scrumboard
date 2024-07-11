@@ -577,7 +577,7 @@
 		print '</td></tr>';
 
 		// Categories
-		if(!empty($conf->categorie->enabled)) {
+		if(isModEnabled('categorie')) {
 			print '<tr><td valign="middle">'.$langs->trans("Categories").'</td><td>';
 			print $form->showCategories($object->id,'project',1);
 			print "</td></tr>";
