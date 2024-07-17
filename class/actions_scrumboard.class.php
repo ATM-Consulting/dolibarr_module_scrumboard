@@ -86,8 +86,7 @@ class ActionsScrumboard extends scrumboard\RetroCompatCommonHookActions
 				if (! $error)
 				{
 					$object = new Task($db);
-					$id = GETPOST('id','int');
-					$id = GETPOSTISSET('taskid') ? GETPOST('taskid','int') : $id;
+					$id = GETPOSTISSET('taskid') ? GETPOST('taskid','int') : GETPOST('id','int');
 					$object->fetch($id, GETPOST('ref','alpha'));
 					if ($object->id > 0)
 					{
