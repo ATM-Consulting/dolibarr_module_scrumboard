@@ -66,13 +66,10 @@ class ActionsScrumboard extends scrumboard\RetroCompatCommonHookActions
 
 		if (in_array('projecttasktime',$TContext) )
 		{
-			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT')
-				&& GETPOST('tab','alphanohtml') != 'timespent'
-			)
+			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT'))
 			{
 				$action = 'addtimespent_scrumboard';
 				$error=0;
-
 				$timespent_durationhour = (double) GETPOST('timespent_durationhour','int');
 				$timespent_durationmin = (double) GETPOST('timespent_durationmin','int');
 				if (empty($timespent_durationhour) && empty($timespent_durationmin))
@@ -86,11 +83,11 @@ class ActionsScrumboard extends scrumboard\RetroCompatCommonHookActions
 					setEventMessages($langs->trans('ErrorUserNotAssignedToTask'), null, 'errors');
 					$error++;
 				}
-
 				if (! $error)
 				{
 					$object = new Task($db);
-					$object->fetch(GETPOST('id','int'), GETPOST('ref','alpha'));
+					$id = empty(GETPOST('id','int')) ? GETPOST('taskid','int') : GETPOST('id','int');
+					$object->fetch($id, GETPOST('ref','alpha'));
 					if ($object->id > 0)
 					{
 						$object->fetch_projet();
