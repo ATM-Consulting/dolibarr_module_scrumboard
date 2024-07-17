@@ -66,7 +66,9 @@ class ActionsScrumboard extends scrumboard\RetroCompatCommonHookActions
 
 		if (in_array('projecttasktime',$TContext) )
 		{
-			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT'))
+			if ($action == 'addtimespent' && $user->hasRight('projet', 'lire') && getDolGlobalInt('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT')
+				&& GETPOST('tab','alphanohtml') != 'timespent'
+			)
 			{
 				$action = 'addtimespent_scrumboard';
 				$error=0;

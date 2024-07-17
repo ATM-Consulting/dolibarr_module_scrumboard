@@ -6,6 +6,7 @@
 
 ## Release 2.6
 
+- FIX :  Ajout d'un condition pour le changement de l'action addtimespent en addtimespent_scrumboard dans le hook doAction pour éviter bug dans le standard- *17/08/2024* - 2.6.2
 - FIX :  Si la conf pour le backlog est active, on devrait voir les tâches dans la colonne backlog et pas TODO - *05/06/2024* - 2.6.1
 - NEW :  Changed Dolibarr compatibility range to 15 min - 19 max  	- *29/11/2023* - 2.6.0  
   	 Changed PHP compatibility range to 7.0 min - 8.2 max 
