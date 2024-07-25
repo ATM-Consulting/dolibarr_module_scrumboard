@@ -470,7 +470,7 @@ function create_task(id_projet) {
 function pop_contact(id_project, id_task) {
 
 	$.ajax({
-		url: '<?php echo dol_buildpath('/scrumboard/scrum.php', 1); ?>?id_task=' + id_task + '&action=addressourcetotask&ajaxcall=1&id=' + id_project
+		url: '<?php echo dol_buildpath('/scrumboard/scrum.php', 1); ?>?id_task=' + id_task + '&action=addressourcetotask&token=<?php echo newToken() ?>&ajaxcall=1&id=' + id_project
 		, method: 'GET'
 		, dataType: 'html'
 		, success: function(data)
@@ -497,7 +497,7 @@ function pop_contact(id_project, id_task) {
 function pop_time(id_project, id_task) {
     let path = '<?php echo dol_buildpath('/projet/tasks/time.php',1); ?>?id='+id_task;
     <?php
-    if(((float) DOL_VERSION) >= 8.0) echo "path += '&action=createtime';";
+    if(((float) DOL_VERSION) >= 8.0) echo "path += '&action=createtime&token=".newToken()."';";
     ?>
         $("#saisie")
                     .load(path+' div.fiche form'
