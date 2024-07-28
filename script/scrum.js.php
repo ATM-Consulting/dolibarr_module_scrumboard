@@ -458,7 +458,7 @@ function create_task(id_projet) {
 		});
 
 		$(this).dialog({
-			title: "<?php echo $langs->trans('AddTask') ?>"
+			title: "<?php echo html_entity_decode($langs->trans('AddTask')) ?>"
 			,width:800
 			,modal:true
 		});
