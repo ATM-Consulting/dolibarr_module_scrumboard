@@ -577,7 +577,7 @@
 		print '</td></tr>';
 
 		// Categories
-		if(!empty($conf->categorie->enabled)) {
+		if(isModEnabled('categorie')) {
 			print '<tr><td valign="middle">'.$langs->trans("Categories").'</td><td>';
 			print $form->showCategories($object->id,'project',1);
 			print "</td></tr>";
@@ -939,13 +939,13 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 					if($id_projet > 0)
 					{
 						if(getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')){
-					   		print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=addressourcetostorie#form-add-ressource-story-'.$storie_k.'"><i class="fa fa-user-plus"></i></a>';
+					   		print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=addressourcetostorie&token='.$newToken.'#form-add-ressource-story-'.$storie_k.'"><i class="fa fa-user-plus"></i></a>';
 						}
 						print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=edit">'.img_picto($langs->trans('Modify'), 'edit.png').'</a>';
 
 						print '&nbsp;';
 						if($storie_k != 1) {
-							print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=confirm_delete">'.img_picto($langs->trans('Delete'), 'delete.png').'</a>';
+							print '<a href="'.$_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k.'&action=confirm_delete&token='.$newToken.'">'.img_picto($langs->trans('Delete'), 'delete.png').'</a>';
 						}
 					}
 					print !empty($id_projet)?'<a href="javascript:toggle_visibility('.$id_projet.', '.$storie_k.')">':'<a href="javascript:toggle_visibility('.$currentProject.', '.$storie_k.')">';

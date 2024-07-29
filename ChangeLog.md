@@ -4,6 +4,11 @@
 
 
 
+## Release 2.7
+
+- FIX : Compat v20
+  Changed Dolibarr compatibility range to 16 min - 20 max - *25/07/2024* - 2.7.0
+
 ## Release 2.6
 
 - FIX :  Ajout d'un condition pour le changement de l'action addtimespent en addtimespent_scrumboard dans le hook doAction pour éviter bug dans le standard- *17/08/2024* - 2.6.2
