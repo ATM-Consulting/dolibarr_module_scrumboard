@@ -120,7 +120,7 @@
 				return secondsAsHoursMinutes(intval($obj['duration_effective']), false);
 			},
 			'ProgressCalculated' => function(&$obj) {
-				return round(100 * $obj['duration_effective'] / $obj['planned_workload'], 2) . '%';
+				return ($obj['planned_workload'] != 0) ? round(100 * $obj['duration_effective'] / $obj['planned_workload'], 2) . '%' : '%';
 			},
 			'Progress'     => 'progress',
 //			'TimeToBill'   => 'tobill',
