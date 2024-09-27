@@ -68,7 +68,8 @@ function scrum_getVelocity(&$db, $id_project) {
 	$projet->fetch($id_project);
 
 	if($projet->date_start>$t2week) $t2week = $projet->date_start;
-	if(version_compare('18.0.0', DOL_VERSION, '<')) {
+	
+	if(intval(DOL_VERSION) < 18) {
 		$res = $db->query("SELECT SUM(tt.task_duration) as task_duration
 		FROM ".MAIN_DB_PREFIX."projet_task_time tt LEFT JOIN ".MAIN_DB_PREFIX."projet_task t ON (tt.fk_task=t.rowid)
 		WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
