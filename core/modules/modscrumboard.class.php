@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.7.0';
+		$this->version = '2.7.1';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -173,11 +173,6 @@ class modscrumboard extends DolibarrModules
 		// 'categories_x'		to add a tab in category view
 		// (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
 
-		//Compatibilty V16
-		$dictionnariesTablePrefix = '';
-		if (intval(DOL_VERSION)< 16){
-			$dictionnariesTablePrefix =  MAIN_DB_PREFIX;
-		}
 
 		// Dictionnaries
 		if (!isModEnabled('scrumboard')) {
@@ -187,7 +182,7 @@ class modscrumboard extends DolibarrModules
 		$this->dictionnaries = array(
 			'langs' => 'scrumboard@scrumboard',
 			'tabname' => array(
-				$dictionnariesTablePrefix . 'c_scrum_columns'
+				MAIN_DB_PREFIX . 'c_scrum_columns'
 			),
 			'tablib' => array(
 					'ScrumManageColumns'
@@ -211,7 +206,7 @@ class modscrumboard extends DolibarrModules
 					'rowid'
 			),
 			'tabcond' => array(
-					"isModEnabled('scrumboard')" // TODO ?? -> && $conf->global->SCRUM_ADD_BACKLOG_REVIEW_COLUMN
+					"isModEnabled('scrumboard')" // TODO ?? -> && getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')
 			)
 		);
 		/* Example:
@@ -275,8 +270,8 @@ class modscrumboard extends DolibarrModules
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'scrumboard_export';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
-		$this->rights[$r][4] = 'export';			// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][4] = 'export';			// In php code, permission will be checked by test if ($user->hasRight("permkey", "level1", "level2"))
+		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->hasRight("permkey", "level1", "level2"))
 		$r++;
 		// Main menu entries
 		$this->menus = array(); // List of menus to add
@@ -290,10 +285,10 @@ class modscrumboard extends DolibarrModules
 			'url'=>'/scrumboard/scrum.php',
 			'langs'=>'mantis@mantis', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position'=>100,
-			'perms'=>'1', // Use 'perms'=>'$user->rights->report->level1->level2' if you want your menu with a permission rules
+			'perms'=>'1', // Use 'perms'=>'$user->hasRight("report", "level1", "level2")' if you want your menu with a permission rules
 			'target'=>'',
 			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
-			'enabled'=>'isModEnabled("scrumboard") && $conf->global->SCRUM_USE_GLOBAL_BOARD'
+			'enabled'=>'isModEnabled("scrumboard") && getDolGlobalString("SCRUM_USE_GLOBAL_BOARD")'
 		);
 		$r++;
 
@@ -316,7 +311,7 @@ class modscrumboard extends DolibarrModules
 		//	// Define condition to show or hide menu entry.
 		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
 		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
+		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',
 		//	'target'=>'',
@@ -341,7 +336,7 @@ class modscrumboard extends DolibarrModules
 		//	// Define condition to show or hide menu entry.
 		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
 		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
+		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',
 		//	'target'=>'',
@@ -368,7 +363,7 @@ class modscrumboard extends DolibarrModules
 		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
 		//	// Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->rights->scrumboard->level1->level2'
+		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
 		//	// if you want your menu with a permission rules
 		//	'perms'=>'1',
 		//	'target'=>'',
@@ -481,8 +476,8 @@ class modscrumboard extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
+		global $conf;
 		$sql = array();
-
         if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 
 		dol_include_once('/scrumboard/config.php');
@@ -500,7 +495,6 @@ class modscrumboard extends DolibarrModules
 		$this->db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task ADD scrum_status varchar(255) NOT NULL DEFAULT \'\'');
 
 		$this->db->query('ALTER TABLE '.MAIN_DB_PREFIX.'c_scrum_columns ADD CONSTRAINT unique_code UNIQUE(code)');
-
 		return $this->_init($sql, $options);
 	}
 
