@@ -68,7 +68,7 @@ function scrum_getVelocity(&$db, $id_project) {
 	$projet->fetch($id_project);
 
 	if($projet->date_start>$t2week) $t2week = $projet->date_start;
-	
+
 	if(intval(DOL_VERSION) < 18) {
 		$res = $db->query("SELECT SUM(tt.task_duration) as task_duration
 		FROM ".MAIN_DB_PREFIX."projet_task_time tt LEFT JOIN ".MAIN_DB_PREFIX."projet_task t ON (tt.fk_task=t.rowid)
@@ -461,9 +461,8 @@ function _getTContact(&$task)
 
 function _get_delivery_date_with_velocity(&$db, &$task, $velocity, $time=null) {
 
-	if( (float)DOL_VERSION <= 3.4 || $velocity==0) {
+	if($velocity==0) {
 		return 0;
-
 	}
 	else {
 		$rest = $task->planned_workload - $task->duration_effective; // nombre de seconde restante
