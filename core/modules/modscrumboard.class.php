@@ -476,7 +476,7 @@ class modscrumboard extends DolibarrModules
 	 */
 	public function init($options = '')
 	{
-		global $conf;
+
 		$sql = array();
         if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 
