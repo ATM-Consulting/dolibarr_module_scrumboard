@@ -95,8 +95,8 @@ global $langs;
 
 		$time = time();
 		$res=$db->query("SELECT SUM(planned_workload-duration_effective) as duration
-			FROM ".MAIN_DB_PREFIX."projet_task
-			WHERE fk_projet=".$id_project." AND progress>0 AND progress<100");
+			FROM ".$db->prefix()."projet_task
+			WHERE fk_projet=".intval($id_project)." AND progress>0 AND progress<100");
 		if($obj=$db->fetch_object($res)) {
 			//time rest in second
 			$time_end_inprogress = $time + $obj->duration / $velocity * 86400;
@@ -105,8 +105,8 @@ global $langs;
 		if($time_end_inprogress<$time)$time_end_inprogress = $time;
 
 		$res=$db->query("SELECT SUM(planned_workload-duration_effective) as duration
-			FROM ".MAIN_DB_PREFIX."projet_task
-			WHERE fk_projet=".$id_project." AND progress=0");
+			FROM ".$db->prefix()."projet_task
+			WHERE fk_projet=".intval($id_project)." AND progress=0");
 		if($obj=$db->fetch_object($res)) {
 			//time rest in second
 			$time_end_todo = $time_end_inprogress + $obj->duration / $velocity * 86400;
@@ -119,14 +119,11 @@ global $langs;
 
 
 	}
-
-
-
+	return $Tab;
 	}
 
-	return $Tab;
 
-}
+
 
 
 function _sort_task(&$db, $TTask) {
