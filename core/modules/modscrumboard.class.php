@@ -182,13 +182,13 @@ class modscrumboard extends DolibarrModules
 		$this->dictionnaries = array(
 			'langs' => 'scrumboard@scrumboard',
 			'tabname' => array(
-				MAIN_DB_PREFIX . 'c_scrum_columns'
+				$db->prefix() . 'c_scrum_columns'
 			),
 			'tablib' => array(
 					'ScrumManageColumns'
 			),
 			'tabsql' => array(
-					'SELECT sc.rowid, sc.label, sc.rang, sc.active, sc.code, sc.entity FROM ' . MAIN_DB_PREFIX . 'c_scrum_columns as sc'
+					'SELECT sc.rowid, sc.label, sc.rang, sc.active, sc.code, sc.entity FROM ' . $db->prefix() . 'c_scrum_columns as sc'
 			),
 			'tabsqlsort' => array(
 					'rang ASC'
@@ -477,6 +477,7 @@ class modscrumboard extends DolibarrModules
 	public function init($options = '')
 	{
 
+		global $db;
 		$sql = array();
         if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
 
@@ -491,10 +492,10 @@ class modscrumboard extends DolibarrModules
 //		$extrafields=new ExtraFields($this->db);
 //		$res = $extrafields->addExtraField('stories', 'ProjectStories', 'varchar', 0, 255, 'projet');
 
-		$this->db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task ADD story_k integer NOT NULL DEFAULT \'0\'');
-		$this->db->query('ALTER TABLE '.MAIN_DB_PREFIX.'projet_task ADD scrum_status varchar(255) NOT NULL DEFAULT \'\'');
+		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD story_k integer NOT NULL DEFAULT \'0\'');
+		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD scrum_status varchar(255) NOT NULL DEFAULT \'\'');
 
-		$this->db->query('ALTER TABLE '.MAIN_DB_PREFIX.'c_scrum_columns ADD CONSTRAINT unique_code UNIQUE(code)');
+		$this->db->query('ALTER TABLE '.$db->prefix().'c_scrum_columns ADD CONSTRAINT unique_code UNIQUE(code)');
 		return $this->_init($sql, $options);
 	}
 
