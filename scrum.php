@@ -35,14 +35,9 @@
 
     $newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
 
-
-	if((float) DOL_VERSION == 6.0) {
-		$TArrayOfCss[] = '/theme/common/fontawesome/css/font-awesome.css';
-	}
 	if(getDolGlobalInt('SCRUM_SHOW_DATES')) {
 		$TArrayOfCssClasses[] = 'withDatesOnTasks';
 	}
-
 
 
 	if (GETPOST('submitAction') === 'getCSV' && $user->hasRight('scrumboard', 'export')) {
@@ -1004,15 +999,15 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 			}
 		}
 
-		if( (float)DOL_VERSION > 3.4 ) {
-			if ($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer'))
+
+		if ($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer'))
+		{
+			if ($object->public || $object->restrictedProjectArea($user,'write') > 0)
 			{
-				if ($object->public || $object->restrictedProjectArea($user,'write') > 0)
-				{
-					print '<a class="butAction" href="javascript:reset_date_task('.$object->id.');">'.$langs->trans('ResetDateTask').'</a>';
-				}
+				print '<a class="butAction" href="javascript:reset_date_task('.$object->id.');">'.$langs->trans('ResetDateTask').'</a>';
 			}
 		}
+
 
 		if (($user->hasRight('projet', 'all', 'creer') || $user->hasRight('projet', 'creer')))
 		{
