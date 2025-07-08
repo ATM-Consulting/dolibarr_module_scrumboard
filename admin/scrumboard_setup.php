@@ -44,6 +44,9 @@ if (preg_match('/set_(.*)/',$action,$reg))
 	if ($code == 'SCRUM_DISPLAY_TASKS_EXTRAFIELDS')
 	{
 		$TtasksEF = GETPOST('SCRUM_DISPLAY_TASKS_EXTRAFIELDS');
+		if (empty($TtasksEF)){
+			$TtasksEF = array();
+		}
 		if (dolibarr_set_const($db, $code, implode(',', $TtasksEF), 'chaine', 0, '', $conf->entity) > 0)
 		{
 			setEventMessage( $langs->trans('RegisterSuccess') );
