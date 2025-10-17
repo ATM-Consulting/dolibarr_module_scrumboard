@@ -5,6 +5,7 @@
 
 
 ## Release 2.7
+- FIX [SP151] : Sentry - Changing run_trigger method to avoid warnings - *17/10/2025* - 2.7.3
 - FIX : fatal wrong type on implode method - *08/08/2025* - 2.7.2
 - FIX : Compat v21 - *16/12/2024* - 2.7.1
 - FIX : Compat v20
@@ -43,5 +44,3 @@
 ## Release 1.0
 
  Initial version
-
-
