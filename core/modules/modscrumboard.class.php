@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.7.1';
+		$this->version = '2.7.3';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -479,18 +479,18 @@ class modscrumboard extends DolibarrModules
 
 		global $db;
 		$sql = array();
-        if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR',true);
+		if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR', true);
 
 		dol_include_once('/scrumboard/config.php');
 		dol_include_once('/scrumboard/script/create-maj-base.php');
 
 		$result = $this->loadTables();
 
-		dolibarr_set_const($this->db, 'SCRUM_DEFAULT_VELOCITY', 7,'chaine',1,'Vélocité par défaut d\'un projet',0);
+		dolibarr_set_const($this->db, 'SCRUM_DEFAULT_VELOCITY', 7, 'chaine', 1, 'Vélocité par défaut d\'un projet', 0);
 
-//		dol_include_once('/core/class/extrafields.class.php');
-//		$extrafields=new ExtraFields($this->db);
-//		$res = $extrafields->addExtraField('stories', 'ProjectStories', 'varchar', 0, 255, 'projet');
+		//      dol_include_once('/core/class/extrafields.class.php');
+		//      $extrafields=new ExtraFields($this->db);
+		//      $res = $extrafields->addExtraField('stories', 'ProjectStories', 'varchar', 0, 255, 'projet');
 
 		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD story_k integer NOT NULL DEFAULT \'0\'');
 		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD scrum_status varchar(255) NOT NULL DEFAULT \'\'');
