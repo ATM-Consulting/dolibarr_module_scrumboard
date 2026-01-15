@@ -1,8 +1,23 @@
 <?php
+/* Copyright (C) 2025 ATM Consulting
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 	if (!defined('NOCSRFCHECK')) define('NOCSRFCHECK', 1);
 	if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
 
-	require('../config.php');
+	require '../config.php';
 	dol_include_once('/scrumboard/lib/scrumboard.lib.php');
 	dol_include_once('/scrumboard/class/scrumboard.class.php');
 	include_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
@@ -17,22 +32,22 @@
 /* <script type="text/javascript"> */
 
 (function ($) {
-    $.fn.serializeFormJSON = function () {
+	$.fn.serializeFormJSON = function () {
 
-        var o = {};
-        var a = this.serializeArray();
-        $.each(a, function () {
-            if (o[this.name]) {
-                if (!o[this.name].push) {
-                    o[this.name] = [o[this.name]];
-                }
-                o[this.name].push(this.value || '');
-            } else {
-                o[this.name] = this.value || '';
-            }
-        });
-        return o;
-    };
+		var o = {};
+		var a = this.serializeArray();
+		$.each(a, function () {
+			if (o[this.name]) {
+				if (!o[this.name].push) {
+					o[this.name] = [o[this.name]];
+				}
+				o[this.name].push(this.value || '');
+			} else {
+				o[this.name] = this.value || '';
+			}
+		});
+		return o;
+	};
 })(jQuery);
 
 function project_velocity(id_project) {
@@ -69,11 +84,11 @@ function project_velocity(id_project) {
 function project_get_tasks(id_project, status) {
 	$('ul[rel="'+status+'"]').empty();
 
-    var data = $('#scrum_filter_by_user').serializeFormJSON();
-    data.get = 'tasks';
-    data.status = status;
-    data.id_project = id_project;
-    data.async = false;
+	var data = $('#scrum_filter_by_user').serializeFormJSON();
+	data.get = 'tasks';
+	data.status = status;
+	data.id_project = id_project;
+	data.async = false;
 
 	$.ajax({
 		url : "./script/interface.php"
@@ -132,13 +147,11 @@ function project_create_task(id_project) {
 
 		<?php
 		// TODO: Conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN !
-					if(getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
-						echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=backlog]\')';
-					}
-					else{
-
-						echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=todo]\')';
-					}
+		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
+			echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=backlog]\')';
+		} else {
+			echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=todo]\')';
+		}
 		?>
 
 
@@ -224,19 +237,19 @@ function project_refresh_task(id_project, task) {
 			hide: { delay: 50 },
 			tooltipClass: "mytooltip",
 			content: function () {
-  				return $(this).prop('title');		/* To force to get title as is */
+				  return $(this).prop('title');		/* To force to get title as is */
 				}
 		});
 	}
 	//console.log(task.options_display);
 	$item.find('.task-extrafields').html(task.options_display);
 
-	$item.find('.task-ref a').html(task.ref).attr("href", '<?php echo dol_buildpath('/projet/tasks/task.php',1) ?>?withproject=1&id='+task.id);
+	$item.find('.task-ref a').html(task.ref).attr("href", '<?php echo dol_buildpath('/projet/tasks/task.php', 1) ?>?withproject=1&id='+task.id);
 	$item.find('.task-users-affected').html(task.internal_contacts).append(task.external_contacts);
 	if (task.formatted_date_start_end) {
-        $item.find('.task-dates').html('<span>' + task.formatted_date_start_end + '</span>');
-    } else {
-	    $item.find('.task-dates').hide();
+		$item.find('.task-dates').html('<span>' + task.formatted_date_start_end + '</span>');
+	} else {
+		$item.find('.task-dates').hide();
 	}
 	$item.find('.task-real-time span').html(task.aff_time).attr('task-id', task.id);
 	$item.find('.task-allowed-time span').html(task.aff_planned_workload).attr('task-id', task.id);
@@ -255,12 +268,12 @@ function project_refresh_task(id_project, task) {
 	else $item.find('.task-origin a').remove();
 
 	<?php
-	if(getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')){
-	    print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id); ';
+	if (getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')) {
+		print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id); ';
 	}
 	?>
 
-	<?php if(getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
+	<?php if (getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
 	<!--  Commentary conf -->
 	$item.find('.task-comment span').html(task.nbcomment).attr('task-id', task.id);
 
@@ -295,15 +308,15 @@ function project_refresh_task(id_project, task) {
 		var t = new Date().getTime() /1000;
 
 		if( task.time_date_end>0 && task.time_date_end < t ) {
-		    $item.addClass('late-time');
+			$item.addClass('late-time');
 		}
 		else if(task.time_date_delivery>0 && task.time_date_delivery>task.time_date_end) {
-		    $item.addClass('late-delivery');
+			$item.addClass('late-delivery');
 		}
 	}
 
 
-    $item.trigger('endRenderTask', [task]);
+	$item.trigger('endRenderTask', [task]);
 }
 
 function project_get_task(id_project, id_task) {
@@ -329,20 +342,20 @@ function project_get_task(id_project, id_task) {
 
 function project_init_change_type(id_project) {
 
-    $('.task-list').sortable( {
-    	connectWith: ".task-list"
-    	, placeholder: "ui-state-highlight"
-    	,start: function(e, ui){
-	        ui.placeholder.height(ui.helper[0].scrollHeight / 2);
-	    }
-    	,receive: function( event, ui ) {
+	$('.task-list').sortable( {
+		connectWith: ".task-list"
+		, placeholder: "ui-state-highlight"
+		,start: function(e, ui){
+			ui.placeholder.height(ui.helper[0].scrollHeight / 2);
+		}
+		,receive: function( event, ui ) {
 			task=project_get_task(id_project, ui.item.attr('task-id'));
 			task.status = $(this).attr('rel');
 			task.story_k = $(this).closest('ul').attr('story-k');
 			task.scrum_status = $(this).closest('ul').attr('rel');
 
 			$('#task-'+task.id).css('top','');
-	        $('#task-'+task.id).css('left','');
+			$('#task-'+task.id).css('left','');
 			$('#list-task-'+task.status).prepend( $('#task-'+task.id) );
 
 			if(task.scrum_status=='backlog') task.status = 'todo';
@@ -352,16 +365,16 @@ function project_init_change_type(id_project) {
 
 	  }
 	  ,update:function(event,ui) {
-	  	var sortedIDs = $( this ).sortable( "toArray" );
+		  var sortedIDs = $( this ).sortable( "toArray" );
 
-	  	var TTaskID=[];
-	  	$.each(sortedIDs, function(i, id) {
+		  var TTaskID=[];
+		  $.each(sortedIDs, function(i, id) {
 
-	  		taskid = $('#'+id).attr('task-id');
-	  		TTaskID.push( taskid );
-	  	});
+			  taskid = $('#'+id).attr('task-id');
+			  TTaskID.push( taskid );
+		  });
 
-	  	$.ajax({
+		  $.ajax({
 			url : "./script/interface.php"
 			,data: {
 				json:1
@@ -372,7 +385,7 @@ function project_init_change_type(id_project) {
 		});
 
 	  }
-    });
+	});
 }
 
 function project_getsave_task(id_project, id_task) {
@@ -428,7 +441,7 @@ function project_loadTasks(id_projet) {
 	<?php
 	$scrumboardColumn = new ScrumboardColumn;
 	$TColumn = $scrumboardColumn->getTColumnOrder();
-	foreach($TColumn as $column) {
+	foreach ($TColumn as $column) {
 		echo 'project_get_tasks(id_projet ,  \''.$column->code.'\');';
 	}
 	?>
@@ -439,7 +452,7 @@ function create_task(id_projet) {
 	if($('#dialog-create-task').length==0) {
 		$('body').append('<div id="dialog-create-task"></div>');
 	}
-	var url ="<?php echo  dol_buildpath('/projet/tasks.php',1) ?>?action=create&id="+id_projet
+	var url ="<?php echo  dol_buildpath('/projet/tasks.php', 1) ?>?action=create&id="+id_projet
 
 	$('#dialog-create-task').load(url+" div.fiche form",function() {
 
@@ -475,46 +488,46 @@ function pop_contact(id_project, id_task) {
 		, dataType: 'html'
 		, success: function(data)
 		{
-		    $('#saisie').empty();
-		    $(data).find('#form-add-ressource-task-' + id_task).first().appendTo('#saisie');
-		    var fk_user = $("#fk_user").val();
-		    var input = $('<input type="hidden" name="fk_user" value="'+fk_user+'" >')
-		    var form = $('#saisie').find('form');
+			$('#saisie').empty();
+			$(data).find('#form-add-ressource-task-' + id_task).first().appendTo('#saisie');
+			var fk_user = $("#fk_user").val();
+			var input = $('<input type="hidden" name="fk_user" value="'+fk_user+'" >')
+			var form = $('#saisie').find('form');
 
-		    form.append(input);
+			form.append(input);
 
-		    $('#saisie').dialog({
-                modal:true
-                , minWidth:1200
-                , minHeight:200
-                , title:$('li[task-id=' + id_task + '] .task-title span').text()
-            });
+			$('#saisie').dialog({
+				modal:true
+				, minWidth:1200
+				, minHeight:200
+				, title:$('li[task-id=' + id_task + '] .task-title span').text()
+			});
 		}
 	});
 }
 
 
 function pop_time(id_project, id_task) {
-    let path = '<?php echo dol_buildpath('/projet/tasks/time.php',1); ?>?id='+id_task;
-    <?php
-    echo "path += '&action=createtime&token=".newToken()."';";
-    ?>
-        $("#saisie")
-                    .load(path+' div.fiche form'
-                    ,function() {
-                        $('textarea[name=timespent_note]').attr('cols',25).focus();
+	let path = '<?php echo dol_buildpath('/projet/tasks/time.php', 1); ?>?id='+id_task;
+	<?php
+	echo "path += '&action=createtime&token=".newToken()."';";
+	?>
+		$("#saisie")
+					.load(path+' div.fiche form'
+					,function() {
+						$('textarea[name=timespent_note]').attr('cols',25).focus();
 					$('#time').datepicker({
-                                            showOn: 'button',
-                                            buttonImage: '<?php echo DOL_URL_ROOT."/theme/".$conf->theme."/img/object_calendarday.png"; ?>',
-                                            buttonImageOnly: true
-                                            });
+											showOn: 'button',
+											buttonImage: '<?php echo DOL_URL_ROOT."/theme/".$conf->theme."/img/object_calendarday.png"; ?>',
+											buttonImageOnly: true
+											});
 
-                    $('#saisie').on('click', 'form input[name="cancel"]', function(event)
-                    {
-                        $('#saisie').dialog('close');
+					$('#saisie').on('click', 'form input[name="cancel"]', function(event)
+					{
+						$('#saisie').dialog('close');
 
-                        return false;
-                    });
+						return false;
+					});
 
 					$('#saisie form').submit(function() {
 
@@ -547,7 +560,7 @@ function pop_time(id_project, id_task) {
 								message = data.substr(jStart,  jEnd - jStart).replace(/\\'/g,'\'');
 								if(message != "" && message.length < 1000) { // Test on message empty. But could be jEnd > 0
 								// ERror case
-                                					$.jnotify(message,'error');
+													$.jnotify(message,'error');
 								}else{
 									$.jnotify('<?php echo $langs->trans('TimeAdded') ?>');
 								}
@@ -579,13 +592,13 @@ function pop_time(id_project, id_task) {
 				});
 }
 
-<?php if(getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
+<?php if (getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
 <!--  Commentary conf -->
 
 
 function pop_comment(id_project, id_task) {
 	$("#saisie")
-				.load('<?php echo dol_buildpath('/projet/tasks/comment.php',1) ?>?id='+id_task+' #comment'
+				.load('<?php echo dol_buildpath('/projet/tasks/comment.php', 1) ?>?id='+id_task+' #comment'
 				,function() {
 					$('textarea[name="comment_description"]').attr('cols',25).focus();
 
@@ -764,18 +777,18 @@ function toggle_visibility(id_project, storie_order) {
  * selected country; replaces the old <select> with the one returned.
  */
 function state_filter_on_change() {
-    let country_id = $('#selectcountry_id').children('option:selected').val();
-    $.ajax({
-        url : "./script/interface.php"
-        ,data: {
-            json:0
-            ,get: 'get_state_selector'
-            ,country_id: country_id
-            ,preselected_state_id: 0
-            ,async:true
-        }
-        ,dataType: 'html'
-    }).done(function(html) {
-        $('#state_id').parent().html(html);
+	let country_id = $('#selectcountry_id').children('option:selected').val();
+	$.ajax({
+		url : "./script/interface.php"
+		,data: {
+			json:0
+			,get: 'get_state_selector'
+			,country_id: country_id
+			,preselected_state_id: 0
+			,async:true
+		}
+		,dataType: 'html'
+	}).done(function(html) {
+		$('#state_id').parent().html(html);
 	});
 }

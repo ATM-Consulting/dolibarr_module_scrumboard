@@ -35,8 +35,8 @@ global $db, $conf;
 $PDOdb = new TPDOdb;
 $error = 0;
 $TData = getData();
-foreach($TData as $fk_project => $stories) {
-	if(empty($stories)) {
+foreach ($TData as $fk_project => $stories) {
+	if (empty($stories)) {
 		$PDOdb->beginTransaction();
 
 		$story = new TStory;
@@ -46,17 +46,16 @@ foreach($TData as $fk_project => $stories) {
 		$story->label = 'Sprint 1';
 		$resql = $story->save($PDOdb);
 
-		if($resql) $PDOdb->commit();
+		if ($resql) $PDOdb->commit();
 		else {
 			$PDOdb->rollBack();
 			$error++;
 		}
-	}
-	else {
+	} else {
 		$TStorieLabel = explode(',', $stories);
 		$PDOdb->beginTransaction();
 		// Sinon, on lui réaffecte ceux qu'il utilisait
-		foreach($TStorieLabel as $k => $storie_label) {
+		foreach ($TStorieLabel as $k => $storie_label) {
 			$story = new TStory;
 
 			$story->fk_projet = $fk_project;
@@ -64,18 +63,18 @@ foreach($TData as $fk_project => $stories) {
 			$story->label = trim($storie_label);
 			$resql = $story->save($PDOdb);
 
-			if(! $resql) $error++;
+			if (! $resql) $error++;
 		}
 
-		if(empty($error)) $PDOdb->commit();
+		if (empty($error)) $PDOdb->commit();
 		else $PDOdb->rollBack();
 	}
 }
 
-if(empty($error)) {
+if (empty($error)) {
 	$extrafields=new ExtraFields($db);
 	$extralabels = $extrafields->fetch_name_optionals_label('projet');
-	if(! empty($extralabels['stories'])) {
+	if (! empty($extralabels['stories'])) {
 		$extrafields->delete('stories', 'projet');
 	}
 }
@@ -87,14 +86,19 @@ if (! $resql && $db->errno() != 'DB_ERROR_KEY_NAME_ALREADY_EXISTS') {
 	$errordb ++;
 	$errors[] = $db->lasterror;
 }
-
-function getData() {
+/**
+ * Get data from database
+ *
+ * @return array  Data array
+ */
+function getData()
+{
 	global $db;
 
 	// Vérifie si la colonne "stories" a été supprimée, car la 2e requête dépend de cette colonne
 	$extrafields=new ExtraFields($db);
 	$extralabels = $extrafields->fetch_name_optionals_label('projet');
-	if(empty($extralabels['stories'])) {
+	if (empty($extralabels['stories'])) {
 		return array();
 	}
 
@@ -107,7 +111,7 @@ function getData() {
 	$resql = $db->query($sql);
 
 	$TData = array();
-	if($resql) {
+	if ($resql) {
 		while ($obj = $db->fetch_object($resql)) {
 			$TData[$obj->rowid] = $obj->stories;
 		}
