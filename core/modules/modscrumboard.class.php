@@ -63,7 +63,7 @@ class modscrumboard extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.7.3';
+		$this->version = '2.7.4';
 		// Url to the file with your last numberversion of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -148,9 +148,9 @@ class modscrumboard extends DolibarrModules
 		// Example:
 		$this->tabs = array(
 			//	// To add a new tab identified by code tabname1
-			//	'objecttype:+tabname1:Title1:langfile@scrumboard:$user->rights->scrumboard->read:/scrumboard/mynewtab1.php?id=__ID__',
+			//	'objecttype:+tabname1:Title1:langfile@scrumboard:$user->hasRight('scrumboard', 'read'):/scrumboard/mynewtab1.php?id=__ID__',
 			//	// To add another new tab identified by code tabname2
-			//	'objecttype:+tabname2:Title2:langfile@scrumboard:$user->rights->othermodule->read:/scrumboard/mynewtab2.php?id=__ID__',
+			//	'objecttype:+tabname2:Title2:langfile@scrumboard:$user->hasRight('othermodule', 'read'):/scrumboard/mynewtab2.php?id=__ID__',
 			//	// To remove an existing tab identified by code tabname
 			//	'objecttype:-tabname'
 			'project:+scrumboard:ScrumBoard:scrumboard@scrumboard::/scrumboard/scrum.php?id=__ID__'

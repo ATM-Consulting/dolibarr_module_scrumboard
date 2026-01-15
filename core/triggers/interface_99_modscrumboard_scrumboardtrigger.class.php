@@ -52,7 +52,7 @@ class Interfacescrumboardtrigger
 		$this->description = "Triggers of this module are empty functions. They have no effect. They are provided for tutorial purpose only.";
 		// 'development', 'experimental', 'dolibarr' or version
 		$this->version = 'development';
-		$this->picto = 'scrumboard@scrumboard';
+		$this->picto = 'scrumboard@scrumboard.png';
 	}
 
 	/**
