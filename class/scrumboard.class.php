@@ -85,45 +85,21 @@ class ScrumboardColumn extends TObjetStd
 	}
 
 	/**
-	 * Build default scrum columns as objects.
-	 *
-	 * @return array
-	 */
-	private function getDefaultColumnsForDictionaryMode()
-	{
-		$Tab = array();
-		foreach (array('backlog' => 'Ideas', 'todo' => 'toDo', 'inprogress' => 'inProgress', 'review' => 'review', 'finish' => 'finish') as $code => $label) {
-			$obj = new stdClass;
-			$obj->label = $label;
-			$obj->code = $code;
-			$Tab[] = $obj;
-		}
-
-		return $Tab;
-	}
-
-	/**
 	 * Renvoi un array contenant l'ordre des colonnes (check la conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN)
 	 *
 	 * @param   bool    $force_load     Force reload from DB
 	 * @return  array                   Array of columns
 	 */
-	public function getTColumnOrder($force_load = false)
+	public function getTColumnOrder(bool $force_load = false): array
 	{
 		global $conf;
 
 		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
-			if (empty($this->TColumn) || $force_load) {
-				$PDOdb = new TPDOdb;
-				$this->LoadAllBy($PDOdb, array('active' => 1, 'entity' => $conf->entity));
-				// In multicompany setups, columns may exist only on master entity.
-				if (empty($this->TColumn) && (int) $conf->entity !== 1) {
-					$this->LoadAllBy($PDOdb, array('active' => 1, 'entity' => 1));
-				}
-				// Fallback if dictionary is empty/inactive.
-				if (empty($this->TColumn)) {
-					$this->TColumn = $this->getDefaultColumnsForDictionaryMode();
-				}
+			$PDOdb = new TPDOdb;
+			$this->TColumn = array();
+			$this->LoadAllBy($PDOdb, array('active' => 1, 'entity' => (int) $conf->entity));
+			if (empty($this->TColumn) && (int) $conf->entity !== 1) {
+				$this->LoadAllBy($PDOdb, array('active' => 1, 'entity' => 1));
 			}
 
 			return $this->TColumn;
