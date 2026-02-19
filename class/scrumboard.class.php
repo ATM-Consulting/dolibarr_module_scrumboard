@@ -90,14 +90,22 @@ class ScrumboardColumn extends TObjetStd
 	 * @param   bool    $force_load     Force reload from DB
 	 * @return  array                   Array of columns
 	 */
-	public function getTColumnOrder($force_load = false)
+	public function getTColumnOrder(bool $force_load = false): array
 	{
-		global $conf;
+		global $conf, $db;
 
 		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
 			if (empty($this->TColumn) || $force_load) {
-				$PDOdb = new TPDOdb;
-				$this->LoadAllBy($PDOdb, array('active' => 1, 'entity' => $conf->entity));
+				$dbhandler = !empty($this->db) ? $this->db : $db;
+				if (!is_object($dbhandler) || !method_exists($dbhandler, 'ExecuteAsArray')) {
+					$dbhandler = new TPDOdb;
+				}
+				$this->TColumn = array();
+				$this->LoadAllBy($dbhandler, array('active' => 1, 'entity' => (int) $conf->entity));
+				if (empty($this->TColumn) && (int) $conf->entity !== 1) {
+					dol_syslog(__METHOD__ . ' Fallback on master entity columns (entity=1), no active column found for entity=' . ((int) $conf->entity), LOG_INFO);
+					$this->LoadAllBy($dbhandler, array('active' => 1, 'entity' => 1));
+				}
 			}
 
 			return $this->TColumn;

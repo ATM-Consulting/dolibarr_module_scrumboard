@@ -5,6 +5,7 @@
 
 
 ## Release 2.7
+- FIX : Keep ScrumBoard columns visible when dictionary mode is enabled and no active columns are available on current entity - *17/02/2026* - 2.7.5
 - FIX : COMPAT V23 - *08/08/2025* - 2.7.4
 - FIX [SP151] : Sentry - Changing run_trigger method to avoid warnings - *17/10/2025* - 2.7.3
 - FIX : fatal wrong type on implode method - *08/08/2025* - 2.7.2
