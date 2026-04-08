@@ -2,7 +2,8 @@
 
 ## NOT RELEASED
 
-
+## Release 2.8
+- NEW : Release V23 - *08/04/2026* - 2.8
 
 ## Release 2.7
 - FIX : Keep ScrumBoard columns visible when dictionary mode is enabled and no active columns are available on current entity - *17/02/2026* - 2.7.5
