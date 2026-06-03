@@ -3,6 +3,7 @@
 ## NOT RELEASED
 
 ## Release 2.8
+- FIX : Compat V24 - add CSRF token on add-resource-to-task link (MAIN_SECURITY_CSRF_WITH_TOKEN=3) - *03/06/2026* - 2.8.1
 - NEW : Release V23 - *08/04/2026* - 2.8
 
 ## Release 2.7
