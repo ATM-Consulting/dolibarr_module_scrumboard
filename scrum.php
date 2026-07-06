@@ -595,10 +595,10 @@
 			print '<tr><td>'.$langs->trans("showDescriptionInTask").'</td>';
 			print '<td>';
 			if(!empty($_SESSION['scrumboard']['showdesc'][$id_projet])) {
-				print '<a href="'.dol_buildpath('scrumboard/scrum.php',1).'?id='.$id_projet.'&action=hide_desc">'.img_picto('test','switch_on.png').'</a>';
+				print '<a href="'.dol_buildpath('scrumboard/scrum.php',1).'?id='.$id_projet.'&action=hide_desc&token='.newToken().'">'.img_picto('test','switch_on.png').'</a>';
 			}
 			else {
-				print '<a href="'.dol_buildpath('scrumboard/scrum.php',1).'?id='.$id_projet.'&action=show_desc">'.img_picto('test','switch_off.png').'</a>';
+				print '<a href="'.dol_buildpath('scrumboard/scrum.php',1).'?id='.$id_projet.'&action=show_desc&token='.newToken().'">'.img_picto('test','switch_off.png').'</a>';
 			}
 			print '</td></tr>';
 		}

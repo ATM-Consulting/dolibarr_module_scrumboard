@@ -269,7 +269,7 @@ function project_refresh_task(id_project, task) {
 
 	<?php
 	if (getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')) {
-		print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id); ';
+		print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id + "&token='.newToken().'"); ';
 	}
 	?>
 
