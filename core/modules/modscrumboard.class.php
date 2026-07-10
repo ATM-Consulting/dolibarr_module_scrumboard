@@ -18,7 +18,6 @@
 
 /**
  * 	\defgroup	scrumboard	scrumboard module
- * 	\brief		scrumboard module descriptor.
  * 	\file		core/modules/modscrumboard.class.php
  * 	\ingroup	scrumboard
  * 	\brief		Description and activation file for module scrumboard
@@ -38,145 +37,65 @@ class modscrumboard extends DolibarrModules
 	 */
 	public function __construct($db)
 	{
-		global $langs, $conf;
+		global $conf;
 
 		$this->db = $db;
 
 		$this->editor_name = 'ATM Consulting';
 		$this->editor_url = 'https://www.atm-consulting.fr';
-		// Id for module (must be unique).
-		// Use a free id here
-		// (See in Home -> System information -> Dolibarr for list of used modules id).
-		$this->numero = 104210; // 104000 to 104999 for ATM CONSULTING
+		// Id for module (must be unique). 104000 to 104999 for ATM CONSULTING
+		$this->numero = 104210;
 		// Key text used to identify module (for permissions, menus, etc...)
 		$this->rights_class = 'scrumboard';
 
-		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
-		// It is used to group modules in module setup page
+		// Family used to group modules in module setup page
 		$this->family = "projects";
-		// Module label (no space allowed)
-		// used if translation string 'ModuleXXXName' not found
-		// (where XXX is value of numeric property 'numero' of module)
+		// Module label (no space allowed), used if translation 'ModuleXXXName' not found
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
-		// Module description
-		// used if translation string 'ModuleXXXDesc' not found
-		// (where XXX is value of numeric property 'numero' of module)
+		// Module description, used if translation 'ModuleXXXDesc' not found
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.8.1';
-		// Url to the file with your last numberversion of this module
+		$this->version = '2.8.2';
+		// Url to the file with the last version number of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
 
 		// Key used in llx_const table to save module status enabled/disabled
-		// (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
-		// Where to store the module in setup page
-		// (0=common,1=interface,2=others,3=very specific)
+		// Where to store the module in setup page (0=common)
 		$this->special = 0;
-		// Name of image file used for this module.
-		// If file is in theme/yourtheme/img directory under name object_pictovalue.png
-		// use this->picto='pictovalue'
-		// If file is in module/img directory under name object_pictovalue.png
-		// use this->picto='pictovalue@module'
-		$this->picto = 'module.svg@scrumboard'; // mypicto@scrumboard
-		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
-		// for default path (eg: /scrumboard/core/xxxxx) (0=disable, 1=enable)
-		// for specific path of parts (eg: /scrumboard/core/modules/barcode)
-		// for specific css file (eg: /scrumboard/css/scrumboard.css.php)
+		$this->picto = 'module.svg@scrumboard';
+
+		// Module parts (triggers, hooks, ...)
 		$this->module_parts = array(
-			// Set this to 1 if module has its own trigger directory
 			'triggers' => 1,
-			// Set this to 1 if module has its own login method directory
-			//'login' => 0,
-			// Set this to 1 if module has its own substitution function file
-			//'substitutions' => 0,
-			// Set this to 1 if module has its own menus handler directory
-			//'menus' => 0,
-			// Set this to 1 if module has its own barcode directory
-			//'barcode' => 0,
-			// Set this to 1 if module has its own models directory
-			//'models' => 0,
-			// Set this to relative path of css if module has its own css file
-			//'css' => '/scrumboard/css/mycss.css.php',
-			// Set here all hooks context managed by module
-			'hooks' => array('projecttaskcard', 'projecttasktime')
-			// Set here all workflow context managed by module
-			//'workflow' => array('order' => array('WORKFLOW_ORDER_AUTOCREATE_INVOICE'))
+			'hooks' => array('projecttaskcard', 'projecttasktime'),
 		);
 
-		// Data directories to create when module is enabled.
-		// Example: this->dirs = array("/scrumboard/temp");
+		// Data directories to create when module is enabled
 		$this->dirs = array();
 
-		// Config pages. Put here list of php pages
-		// stored into scrumboard/admin directory, used to setup module.
+		// Config page stored into scrumboard/admin directory
 		$this->config_page_url = 'scrumboard_setup.php@scrumboard';
 
 		// Dependencies
-		// List of modules id that must be enabled if this module is enabled
 		$this->depends = array();
-		// List of modules id to disable if this one is disabled
 		$this->requiredby = array();
-		// Minimum version of PHP required by module
 		$this->phpmin = array(7, 0);
-		// Minimum version of Dolibarr required by module
 		$this->need_dolibarr_version = array(16, 0);
-		$this->langfiles = array("scrumboard@scrumboard"); // langfiles@scrumboard
-		// Constants
-		// List of particular constants to add when module is enabled
-		// (key, 'chaine', value, desc, visible, 'current' or 'allentities', deleteonunactive)
-		// Example:
-		$this->const = array(
-			//	0=>array(
-			//		'MYMODULE_MYNEWCONST1',
-			//		'chaine',
-			//		'myvalue',
-			//		'This is a constant to add',
-			//		1
-			//	),
-			//	1=>array(
-			//		'MYMODULE_MYNEWCONST2',
-			//		'chaine',
-			//		'myvalue',
-			//		'This is another constant to add',
-			//		0
-			//	)
-		);
+		$this->langfiles = array("scrumboard@scrumboard");
 
-		// Array to add new pages in new tabs
-		// Example:
+		// Constants added when module is enabled
+		$this->const = array();
+
+		// New tabs added by module
 		$this->tabs = array(
-			//	// To add a new tab identified by code tabname1
-			//	'objecttype:+tabname1:Title1:langfile@scrumboard:$user->hasRight('scrumboard', 'read'):/scrumboard/mynewtab1.php?id=__ID__',
-			//	// To add another new tab identified by code tabname2
-			//	'objecttype:+tabname2:Title2:langfile@scrumboard:$user->hasRight('othermodule', 'read'):/scrumboard/mynewtab2.php?id=__ID__',
-			//	// To remove an existing tab identified by code tabname
-			//	'objecttype:-tabname'
 			'project:+scrumboard:ScrumBoard:scrumboard@scrumboard::/scrumboard/scrum.php?id=__ID__'
 		);
-		// where objecttype can be
-		// 'thirdparty'			to add a tab in third party view
-		// 'intervention'		to add a tab in intervention view
-		// 'order_supplier'		to add a tab in supplier order view
-		// 'invoice_supplier'	to add a tab in supplier invoice view
-		// 'invoice'			to add a tab in customer invoice view
-		// 'order'				to add a tab in customer order view
-		// 'product'			to add a tab in product view
-		// 'stock'				to add a tab in stock view
-		// 'propal'				to add a tab in propal view
-		// 'member'				to add a tab in fundation member view
-		// 'contract'			to add a tab in contract view
-		// 'user'				to add a tab in user view
-		// 'group'				to add a tab in group view
-		// 'contact'			to add a tab in contact view
-		// 'categories_x'		to add a tab in category view
-		// (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
 
-
-		// Dictionnaries
+		// Dictionnaries. Stub $conf->scrumboard to avoid warnings when module is not enabled yet.
 		if (!isModEnabled('scrumboard')) {
-			$conf->scrumboard=new stdClass();
+			$conf->scrumboard = new stdClass();
 			$conf->scrumboard->enabled = 0;
 		}
 		$this->dictionnaries = array(
@@ -185,284 +104,64 @@ class modscrumboard extends DolibarrModules
 				$db->prefix() . 'c_scrum_columns'
 			),
 			'tablib' => array(
-					'ScrumManageColumns'
+				'ScrumManageColumns'
 			),
 			'tabsql' => array(
-					'SELECT sc.rowid, sc.label, sc.rang, sc.active, sc.code, sc.entity FROM ' . $db->prefix() . 'c_scrum_columns as sc'
+				'SELECT sc.rowid, sc.label, sc.rang, sc.active, sc.code, sc.entity FROM ' . $db->prefix() . 'c_scrum_columns as sc'
 			),
 			'tabsqlsort' => array(
-					'rang ASC'
+				'rang ASC'
 			),
 			'tabfield' => array(
-					'label,code,rang'
+				'label,code,rang'
 			),
 			'tabfieldvalue' => array(
-					'label,code,rang'
+				'label,code,rang'
 			),
 			'tabfieldinsert' => array(
-					'label,code,rang'
+				'label,code,rang'
 			),
 			'tabrowid' => array(
-					'rowid'
+				'rowid'
 			),
 			'tabcond' => array(
-					"isModEnabled('scrumboard')" // TODO ?? -> && getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')
+				"isModEnabled('scrumboard')" // TODO ?? -> && getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')
 			)
 		);
-		/* Example:
-		  // This is to avoid warnings
-		  if (! isset(isModEnabled('scrumboard'))) isModEnabled('scrumboard')=0;
-		  $this->dictionnaries=array(
-		  'langs'=>'scrumboard@scrumboard',
-		  // List of tables we want to see into dictonnary editor
-		  'tabname'=>array(
-		  MAIN_DB_PREFIX."table1",
-		  MAIN_DB_PREFIX."table2",
-		  MAIN_DB_PREFIX."table3"
-		  ),
-		  // Label of tables
-		  'tablib'=>array("Table1","Table2","Table3"),
-		  // Request to select fields
-		  'tabsql'=>array(
-		  'SELECT f.rowid as rowid, f.code, f.label, f.active'
-		  . ' FROM ' . MAIN_DB_PREFIX . 'table1 as f',
-		  'SELECT f.rowid as rowid, f.code, f.label, f.active'
-		  . ' FROM ' . MAIN_DB_PREFIX . 'table2 as f',
-		  'SELECT f.rowid as rowid, f.code, f.label, f.active'
-		  . ' FROM ' . MAIN_DB_PREFIX . 'table3 as f'
-		  ),
-		  // Sort order
-		  'tabsqlsort'=>array("label ASC","label ASC","label ASC"),
-		  // List of fields (result of select to show dictionnary)
-		  'tabfield'=>array("code,label","code,label","code,label"),
-		  // List of fields (list of fields to edit a record)
-		  'tabfieldvalue'=>array("code,label","code,label","code,label"),
-		  // List of fields (list of fields for insert)
-		  'tabfieldinsert'=>array("code,label","code,label","code,label"),
-		  // Name of columns with primary key (try to always name it 'rowid')
-		  'tabrowid'=>array("rowid","rowid","rowid"),
-		  // Condition to show each dictionnary
-		  'tabcond'=>array(
-		  isModEnabled('scrumboard'),
-		  isModEnabled('scrumboard'),
-		  isModEnabled('scrumboard')
-		  )
-		  );
-		 */
 
 		// Boxes
-		// Add here list of php file(s) stored in core/boxes that contains class to show a box.
-		$this->boxes = array(); // Boxes list
+		$this->boxes = array();
 		$r = 0;
-		// Example:
-
 		$this->boxes[$r][1] = "scrumboard_box@scrumboard";
-		$r ++;
-		/*
-		  $this->boxes[$r][1] = "myboxb.php";
-		  $r++;
-		 */
+		$r++;
 
 		// Permissions
-		$this->rights = array(); // Permission array used by this module
-
+		$this->rights = array();
 		$r = 0;
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'scrumboard_export';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
-		$this->rights[$r][4] = 'export';			// In php code, permission will be checked by test if ($user->hasRight("permkey", "level1", "level2"))
-		$this->rights[$r][5] = '';					// In php code, permission will be checked by test if ($user->hasRight("permkey", "level1", "level2"))
+		$this->rights[$r][4] = 'export';			// In php code, permission checked with $user->hasRight("permkey", "level1", "level2")
+		$this->rights[$r][5] = '';
 		$r++;
-		// Main menu entries
-		$this->menus = array(); // List of menus to add
-		$r = 0;
 
-		$this->menu[$r]=array( 'fk_menu'=>'fk_mainmenu=project', // Put 0 if this is a top menu
-			'type'=>'left', // This is a Top menu entry
-			'titre'=>'Scrumboard',
-			'mainmenu'=>'project',
-			'leftmenu'=>'Scrumboard',
-			'url'=>'/scrumboard/scrum.php',
-			'langs'=>'mantis@mantis', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>100,
-			'perms'=>'1', // Use 'perms'=>'$user->hasRight("report", "level1", "level2")' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
-			'enabled'=>'isModEnabled("scrumboard") && getDolGlobalString("SCRUM_USE_GLOBAL_BOARD")'
+		// Main menu entries
+		$r = 0;
+		$this->menu[$r] = array(
+			'fk_menu' => 'fk_mainmenu=project',
+			'type' => 'left',
+			'titre' => 'Scrumboard',
+			'mainmenu' => 'project',
+			'leftmenu' => 'Scrumboard',
+			'url' => '/scrumboard/scrum.php',
+			'langs' => 'scrumboard@scrumboard',
+			'position' => 100,
+			'perms' => '1',
+			'target' => '',
+			'user' => 2, // 0=internal users, 1=external users, 2=both
+			'enabled' => 'isModEnabled("scrumboard") && getDolGlobalString("SCRUM_USE_SHARED_BOARD")'
 		);
 		$r++;
-
-		// Add here entries to declare new menus
-		//
-		// Example to declare a new Top Menu entry and its Left menu entry:
-		//$this->menu[$r]=array(
-		//	// Put 0 if this is a top menu
-		//	'fk_menu'=>0,
-		//	// This is a Top menu entry
-		//	'type'=>'top',
-		//	'titre'=>'scrumboard top menu',
-		//	'mainmenu'=>'scrumboard',
-		//	'leftmenu'=>'scrumboard',
-		//	'url'=>'/scrumboard/pagetop.php',
-		//	// Lang file to use (without .lang) by module.
-		//	// File must be in langs/code_CODE/ directory.
-		//	'langs'=>'mylangfile',
-		//	'position'=>100,
-		//	// Define condition to show or hide menu entry.
-		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
-		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
-		//	// if you want your menu with a permission rules
-		//	'perms'=>'1',
-		//	'target'=>'',
-		//	// 0=Menu for internal users, 1=external users, 2=both
-		//	'user'=>2
-		//);
-		//$r++;
-		//$this->menu[$r]=array(
-		//	// Use r=value where r is index key used for the parent menu entry
-		//	// (higher parent must be a top menu entry)
-		//	'fk_menu'=>'r=0',
-		//	// This is a Left menu entry
-		//	'type'=>'left',
-		//	'titre'=>'scrumboard left menu',
-		//	'mainmenu'=>'scrumboard',
-		//	'leftmenu'=>'scrumboard',
-		//	'url'=>'/scrumboard/pagelevel1.php',
-		//	// Lang file to use (without .lang) by module.
-		//	// File must be in langs/code_CODE/ directory.
-		//	'langs'=>'mylangfile',
-		//	'position'=>100,
-		//	// Define condition to show or hide menu entry.
-		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
-		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
-		//	// if you want your menu with a permission rules
-		//	'perms'=>'1',
-		//	'target'=>'',
-		//	// 0=Menu for internal users, 1=external users, 2=both
-		//	'user'=>2
-		//);
-		//$r++;
-		//
-		// Example to declare a Left Menu entry into an existing Top menu entry:
-		//$this->menu[$r]=array(
-		//	// Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy'
-		//	'fk_menu'=>'fk_mainmenu=mainmenucode',
-		//	// This is a Left menu entry
-		//	'type'=>'left',
-		//	'titre'=>'scrumboard left menu',
-		//	'mainmenu'=>'mainmenucode',
-		//	'leftmenu'=>'scrumboard',
-		//	'url'=>'/scrumboard/pagelevel2.php',
-		//	// Lang file to use (without .lang) by module.
-		//	// File must be in langs/code_CODE/ directory.
-		//	'langs'=>'mylangfile',
-		//	'position'=>100,
-		//	// Define condition to show or hide menu entry.
-		//	// Use "isModEnabled('scrumboard')" if entry must be visible if module is enabled.
-		//	// Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		//	'enabled'=>"isModEnabled('scrumboard')",
-		//	// Use 'perms'=>'$user->hasRight("scrumboard", "level1", "level2")'
-		//	// if you want your menu with a permission rules
-		//	'perms'=>'1',
-		//	'target'=>'',
-		//	// 0=Menu for internal users, 1=external users, 2=both
-		//	'user'=>2
-		//);
-		//$r++;
-		// Exports
-		$r = 1;
-
-		// Example:
-		//$this->export_code[$r]=$this->rights_class.'_'.$r;
-		//// Translation key (used only if key ExportDataset_xxx_z not found)
-		//$this->export_label[$r]='CustomersInvoicesAndInvoiceLines';
-		//// Condition to show export in list (ie: '$user->id==3').
-		//// Set to 1 to always show when module is enabled.
-		//$this->export_enabled[$r]='1';
-		//$this->export_permission[$r]=array(array("facture","facture","export"));
-		//$this->export_fields_array[$r]=array(
-		//	's.rowid'=>"IdCompany",
-		//	's.nom'=>'CompanyName',
-		//	's.address'=>'Address',
-		//	's.cp'=>'Zip',
-		//	's.ville'=>'Town',
-		//	's.fk_pays'=>'Country',
-		//	's.tel'=>'Phone',
-		//	's.siren'=>'ProfId1',
-		//	's.siret'=>'ProfId2',
-		//	's.ape'=>'ProfId3',
-		//	's.idprof4'=>'ProfId4',
-		//	's.code_compta'=>'CustomerAccountancyCode',
-		//	's.code_compta_fournisseur'=>'SupplierAccountancyCode',
-		//	'f.rowid'=>"InvoiceId",
-		//	'f.facnumber'=>"InvoiceRef",
-		//	'f.datec'=>"InvoiceDateCreation",
-		//	'f.datef'=>"DateInvoice",
-		//	'f.total'=>"TotalHT",
-		//	'f.total_ttc'=>"TotalTTC",
-		//	'f.tva'=>"TotalVAT",
-		//	'f.paye'=>"InvoicePaid",
-		//	'f.fk_statut'=>'InvoiceStatus',
-		//	'f.note'=>"InvoiceNote",
-		//	'fd.rowid'=>'LineId',
-		//	'fd.description'=>"LineDescription",
-		//	'fd.price'=>"LineUnitPrice",
-		//	'fd.tva_tx'=>"LineVATRate",
-		//	'fd.qty'=>"LineQty",
-		//	'fd.total_ht'=>"LineTotalHT",
-		//	'fd.total_tva'=>"LineTotalTVA",
-		//	'fd.total_ttc'=>"LineTotalTTC",
-		//	'fd.date_start'=>"DateStart",
-		//	'fd.date_end'=>"DateEnd",
-		//	'fd.fk_product'=>'ProductId',
-		//	'p.ref'=>'ProductRef'
-		//);
-		//$this->export_entities_array[$r]=array('s.rowid'=>"company",
-		//	's.nom'=>'company',
-		//	's.address'=>'company',
-		//	's.cp'=>'company',
-		//	's.ville'=>'company',
-		//	's.fk_pays'=>'company',
-		//	's.tel'=>'company',
-		//	's.siren'=>'company',
-		//	's.siret'=>'company',
-		//	's.ape'=>'company',
-		//	's.idprof4'=>'company',
-		//	's.code_compta'=>'company',
-		//	's.code_compta_fournisseur'=>'company',
-		//	'f.rowid'=>"invoice",
-		//	'f.facnumber'=>"invoice",
-		//	'f.datec'=>"invoice",
-		//	'f.datef'=>"invoice",
-		//	'f.total'=>"invoice",
-		//	'f.total_ttc'=>"invoice",
-		//	'f.tva'=>"invoice",
-		//	'f.paye'=>"invoice",
-		//	'f.fk_statut'=>'invoice',
-		//	'f.note'=>"invoice",
-		//	'fd.rowid'=>'invoice_line',
-		//	'fd.description'=>"invoice_line",
-		//	'fd.price'=>"invoice_line",
-		//	'fd.total_ht'=>"invoice_line",
-		//	'fd.total_tva'=>"invoice_line",
-		//	'fd.total_ttc'=>"invoice_line",
-		//	'fd.tva_tx'=>"invoice_line",
-		//	'fd.qty'=>"invoice_line",
-		//	'fd.date_start'=>"invoice_line",
-		//	'fd.date_end'=>"invoice_line",
-		//	'fd.fk_product'=>'product',
-		//	'p.ref'=>'product'
-		//);
-		//$this->export_sql_start[$r] = 'SELECT DISTINCT ';
-		//$this->export_sql_end[$r] = ' FROM (' . MAIN_DB_PREFIX . 'facture as f, '
-		//	. MAIN_DB_PREFIX . 'facturedet as fd, ' . MAIN_DB_PREFIX . 'societe as s)';
-		//$this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX
-		//	. 'product as p on (fd.fk_product = p.rowid)';
-		//$this->export_sql_end[$r] .= ' WHERE f.fk_soc = s.rowid '
-		//	. 'AND f.rowid = fd.fk_facture';
-		//$r++;
 	}
 
 	/**
@@ -477,20 +176,24 @@ class modscrumboard extends DolibarrModules
 	public function init($options = '')
 	{
 
-		global $db;
+		global $db, $conf;
 		$sql = array();
 		if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR', true);
+
+		// Migrate legacy constant SCRUM_USE_GLOBAL_BOARD to SCRUM_USE_SHARED_BOARD.
+		// The legacy name contains the substring "_GLOBAL", rejected by dol_eval() as a
+		// forbidden superglobal token, which corrupted the left menu 'enabled' condition.
+		if (!isset($conf->global->SCRUM_USE_SHARED_BOARD) && isset($conf->global->SCRUM_USE_GLOBAL_BOARD)) {
+			dolibarr_set_const($this->db, 'SCRUM_USE_SHARED_BOARD', getDolGlobalString('SCRUM_USE_GLOBAL_BOARD'), 'chaine', 0, '', $conf->entity);
+			dolibarr_del_const($this->db, 'SCRUM_USE_GLOBAL_BOARD', $conf->entity);
+		}
 
 		dol_include_once('/scrumboard/config.php');
 		dol_include_once('/scrumboard/script/create-maj-base.php');
 
-		$result = $this->loadTables();
+		$this->loadTables();
 
 		dolibarr_set_const($this->db, 'SCRUM_DEFAULT_VELOCITY', 7, 'chaine', 1, 'Vélocité par défaut d\'un projet', 0);
-
-		//      dol_include_once('/core/class/extrafields.class.php');
-		//      $extrafields=new ExtraFields($this->db);
-		//      $res = $extrafields->addExtraField('stories', 'ProjectStories', 'varchar', 0, 255, 'projet');
 
 		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD story_k integer NOT NULL DEFAULT \'0\'');
 		$this->db->query('ALTER TABLE '.$db->prefix().'projet_task ADD scrum_status varchar(255) NOT NULL DEFAULT \'\'');

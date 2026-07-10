@@ -1,6 +1,7 @@
 
 
 ## NOT RELEASED
+- FIX : Shared scrumboard left menu hidden - rename constant SCRUM_USE_GLOBAL_BOARD to SCRUM_USE_SHARED_BOARD ("_GLOBAL" substring was rejected by dol_eval as a forbidden superglobal token, breaking the menu 'enabled' condition on Dolibarr 22+) - 2.8.2
 
 ## Release 2.8
 - FIX : Compat V24 - add CSRF token on add-resource-to-task link (MAIN_SECURITY_CSRF_WITH_TOKEN=3) - *03/06/2026* - 2.8.1

@@ -25,7 +25,7 @@ AllowCompleteModeBacklog = Enable dictionary-based column management
 showLinkedContactToTask = Show resources linked to tasks
 showDescriptionInTask = Show description under title
 showDateInDescription = Show dates in description
-SCRUM_USE_GLOBAL_BOARD = Enable global scrumboard ("Projects" menu, "Scrumboard" submenu)
+SCRUM_USE_SHARED_BOARD = Enable global scrumboard ("Projects" menu, "Scrumboard" submenu)
 
 SB_realtimealt = Time spent
 SB_allowedtimealt = Time planned
