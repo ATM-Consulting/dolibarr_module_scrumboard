@@ -17,16 +17,11 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton_page.php
- *		\ingroup    mymodule othermodule1 othermodule2
- *		\brief      This file is an example of a php page
- *		\version    $Id: skeleton_page.php,v 1.19 2011/07/31 22:21:57 eldy Exp $
- *		\author		Put author name here
- *		\remarks	Put here some comments
+ *	\file		admin/scrumboard_setup.php
+ *	\ingroup	scrumboard
+ *	\brief		Setup page for module scrumboard
  */
-// Change this following line to use the correct relative path (../, ../../, etc)
 require '../config.php';
-// Change this following line to use the correct relative path from htdocs (do not remove DOL_DOCUMENT_ROOT)
 dol_include_once('/core/lib/admin.lib.php');
 dol_include_once('/core/class/extrafields.class.php');
 
@@ -100,6 +95,32 @@ print load_fiche_titre('Scrumboard',$linkback,'setup');
 
 showParameters();
 
+/**
+ * Print an on/off setup row for a boolean constant toggled with ajax_constantonoff().
+ *
+ * @param	string	$labelKey	Translation key used for the row label
+ * @param	string	$const		Constant name to toggle
+ * @param	bool	$var		Alternating row-color flag (passed by reference and toggled)
+ * @return	void
+ */
+function scrumboardPrintOnOffRow($labelKey, $const, &$var)
+{
+	global $langs, $bc;
+
+	$var = !$var;
+	print '<tr '.$bc[$var].'>';
+	print '<td>'.$langs->trans($labelKey).'</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="right" width="300">';
+	print ajax_constantonoff($const);
+	print '</td></tr>';
+}
+
+/**
+ * Display the module setup parameters table.
+ *
+ * @return	void
+ */
 function showParameters() {
 	global $db,$conf,$langs,$bc;
 
@@ -114,6 +135,7 @@ function showParameters() {
 
 	$newToken = function_exists('newToken')?newToken():$_SESSION['newtoken'];
 
+	// Default velocity (free text value)
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 	print '<td>'.$langs->trans("NumberOfWorkingHourInDay").'</td>';
@@ -127,85 +149,18 @@ function showParameters() {
 	print '</form>';
 	print '</td></tr>';
 
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("AllowCompleteModeBacklog").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_ADD_BACKLOG_REVIEW_COLUMN');
-	print '</td></tr>';
+	// Boolean options
+	scrumboardPrintOnOffRow("AllowCompleteModeBacklog", 'SCRUM_ADD_BACKLOG_REVIEW_COLUMN', $var);
+	scrumboardPrintOnOffRow("EnableFilterOnGlobalView", 'SCRUM_FILTER_BY_USER_ENABLE', $var);
+	scrumboardPrintOnOffRow("showLinkedContactToTask", 'SCRUM_SHOW_LINKED_CONTACT', $var);
+	scrumboardPrintOnOffRow("showDescriptionInTask", 'SCRUM_SHOW_DESCRIPTION_IN_TASK', $var);
+	scrumboardPrintOnOffRow("showDateInDescription", 'SCRUM_SHOW_DATES_IN_DESCRIPTION', $var);
+	scrumboardPrintOnOffRow("SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT", 'SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT', $var);
+	scrumboardPrintOnOffRow("SCRUM_USE_SHARED_BOARD", 'SCRUM_USE_SHARED_BOARD', $var);
+	scrumboardPrintOnOffRow("SCRUM_SHOW_DATES", 'SCRUM_SHOW_DATES', $var);
+	scrumboardPrintOnOffRow("GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS", 'GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS', $var);
 
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-
-	print '<td>'.$langs->trans("EnableFilterOnGlobalView").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_FILTER_BY_USER_ENABLE');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-
-	print '<td>'.$langs->trans("showLinkedContactToTask").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SHOW_LINKED_CONTACT');
-
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-
-	print '<td>'.$langs->trans("showDescriptionInTask").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SHOW_DESCRIPTION_IN_TASK');
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-
-	print '<td>'.$langs->trans("showDateInDescription").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SHOW_DATES_IN_DESCRIPTION');
-
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-
-	print '<td>'.$langs->trans("SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_ADD_TIMESPENT_ON_PROJECT_DRAFT');
-
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("SCRUM_USE_GLOBAL_BOARD").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_USE_GLOBAL_BOARD');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("SCRUM_SHOW_DATES").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('SCRUM_SHOW_DATES');
-	print '</td></tr>';
-
-	$var=!$var;
-	print '<tr '.$bc[$var].'>';
-	print '<td>'.$langs->trans("GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS").'</td>';
-	print '<td align="center" width="20">&nbsp;</td>';
-	print '<td align="right" width="300">';
-	print ajax_constantonoff('GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS');
-	print '</td></tr>';
-
+	// Task extrafields to display (multiselect)
 	$var=!$var;
 	print '<tr '.$bc[$var].'>';
 	print '<td>'.$langs->trans("SCRUM_DISPLAY_TASKS_EXTRAFIELDS").'</td>';
@@ -220,8 +175,6 @@ function showParameters() {
 	print '<input class="button" type="submit" value="'.$langs->trans('Save').'">';
 	print '</form>';
 	print '</td></tr>';
-
-
 
 	print '</table>';
 
