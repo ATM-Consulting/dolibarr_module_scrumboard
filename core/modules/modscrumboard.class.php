@@ -184,8 +184,9 @@ class modscrumboard extends DolibarrModules
 		// The legacy name contains the substring "_GLOBAL", rejected by dol_eval() as a
 		// forbidden superglobal token, which corrupted the left menu 'enabled' condition.
 		if (!isset($conf->global->SCRUM_USE_SHARED_BOARD) && isset($conf->global->SCRUM_USE_GLOBAL_BOARD)) {
-			dolibarr_set_const($this->db, 'SCRUM_USE_SHARED_BOARD', getDolGlobalString('SCRUM_USE_GLOBAL_BOARD'), 'chaine', 0, '', $conf->entity);
-			dolibarr_del_const($this->db, 'SCRUM_USE_GLOBAL_BOARD', $conf->entity);
+			if (dolibarr_set_const($this->db, 'SCRUM_USE_SHARED_BOARD', getDolGlobalString('SCRUM_USE_GLOBAL_BOARD'), 'chaine', 0, '', $conf->entity) > 0) {
+				dolibarr_del_const($this->db, 'SCRUM_USE_GLOBAL_BOARD', $conf->entity);
+			}
 		}
 
 		dol_include_once('/scrumboard/config.php');
