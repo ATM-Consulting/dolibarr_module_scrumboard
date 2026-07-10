@@ -25,7 +25,7 @@ AllowCompleteModeBacklog=Activer la gestion des colonnes via le dictionnaire
 showLinkedContactToTask=Afficher les ressources associées aux tâches
 showDescriptionInTask=Voir la description sous le titre sans survol
 showDateInDescription=Voir les dates dans la description
-SCRUM_USE_GLOBAL_BOARD=Activer le scrumboard global (menu "Projets", sous-menu "Scrumboard")
+SCRUM_USE_SHARED_BOARD=Activer le scrumboard global (menu "Projets", sous-menu "Scrumboard")
 
 SB_realtimealt=Temps consommé
 SB_allowedtimealt=Temps prévu
@@ -43,7 +43,7 @@ DateStartAfterDateEnd=La date de début est positionnée après la date de fin
 OriginFile = Document d'origine
 UserFilter = Filtre par utilisateur
 AddRessource=Ajouter une ressource à %s
-ContactProjectType=Type de contact projet 
+ContactProjectType=Type de contact projet
 ContactTaskType=Type de contact tâches
 LinkContact=Lier un contact
 UsersAddedToTask=%s tâche(s) modifiée(s)
