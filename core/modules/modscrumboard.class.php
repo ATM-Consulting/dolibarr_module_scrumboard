@@ -55,7 +55,7 @@ class modscrumboard extends DolibarrModules
 		// Module description, used if translation 'ModuleXXXDesc' not found
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.8.2';
+		$this->version = '2.8.3';
 		// Url to the file with the last version number of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
