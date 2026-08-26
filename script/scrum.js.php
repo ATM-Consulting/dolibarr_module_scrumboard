@@ -535,7 +535,8 @@ function pop_time(id_project, id_task) {
 							, {
 								token : $(this).find('input[name=token]').val()
 								,action : 'addtimespent'
-								,id : $(this).find('input[name=id]').val()
+								,id : id_task
+								,taskid : id_task
 								,withproject : 0
 								,time : $(this).find('input[name=time]').val()
 								,timeday : $(this).find('input[name=timeday]').val()
