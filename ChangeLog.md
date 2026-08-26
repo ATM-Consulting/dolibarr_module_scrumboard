@@ -1,6 +1,7 @@
 
 
 ## NOT RELEASED
+- FIX : Compat V24 - time spent from a scrumboard tile rejected with "Task is mandatory" (the core timespent form no longer emits the hidden `id` field since v23, the AJAX payload now sends `taskid`) - 2.8.3
 - FIX : Shared scrumboard left menu hidden - rename constant SCRUM_USE_GLOBAL_BOARD to SCRUM_USE_SHARED_BOARD ("_GLOBAL" substring was rejected by dol_eval as a forbidden superglobal token, breaking the menu 'enabled' condition on Dolibarr 22+) - 2.8.2
 
 ## Release 2.8
