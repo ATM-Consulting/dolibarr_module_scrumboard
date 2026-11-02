@@ -1279,7 +1279,9 @@ function _printExtrafieldsFilter()
 				echo '<tr><td>';
 				echo $extrafieldstask->attributes[$task->table_element]['label'][$key];
 				echo '</td><td>';
-				echo $extrafieldstask->showInputField($key, $search_array_options['search_options_' . $key], '', '', 'search_', '', '', $task->table_element);
+				// getOptionalsFromPost() omits most field types when no value was submitted.
+				$searchValue = is_array($search_array_options) && array_key_exists('search_options_' . $key, $search_array_options) ? $search_array_options['search_options_' . $key] : '';
+				echo $extrafieldstask->showInputField($key, $searchValue, '', '', 'search_', '', '', $task->table_element);
 				echo '</td></tr>';
 			}
 		}
