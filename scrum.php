@@ -898,10 +898,10 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 					print '<td>';
 					print $langs->trans('From').' : ';
-					print $form->select_date((empty($storyToEdit->date_start) ? -1 : $storyToEdit->date_start), 'storie_date_start');
+					print $form->selectDate((empty($storyToEdit->date_start) ? -1 : $storyToEdit->date_start), 'storie_date_start');
 					print '&nbsp;';
 					print $langs->trans('to').' : ';
-					print $form->select_date((empty($storyToEdit->date_end) ? -1 : $storyToEdit->date_end), 'storie_date_end');
+					print $form->selectDate((empty($storyToEdit->date_end) ? -1 : $storyToEdit->date_end), 'storie_date_end');
 					print '</td>';
 
 					if($nbColumns > 3) print '<td colspan="'.($nbColumns-3).'"></td>';
@@ -1130,10 +1130,10 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 			<?php
 
 			print '<span>'.$langs->trans('From').' : </span>';
-			print $form->select_date(-1, 'add_storie_date_start');
+			print $form->selectDate(-1, 'add_storie_date_start');
 
 			print '<span>'.$langs->trans('to').' : </span>';
-			print $form->select_date(-1, 'add_storie_date_end');
+			print $form->selectDate(-1, 'add_storie_date_end');
 
 			?>
 
@@ -1188,19 +1188,19 @@ function _printDateFilter($form)
     echo  '<tr>'
          .   '<td>' . $langs->trans('FilterDateStartAfter') . '</td>'
          .   '<td>'
-         .      $form->select_date(dol_mktime(0, 0, 0, GETPOST('start_date_aftermonth'), GETPOST('start_date_afterday'), GETPOST('start_date_afteryear')), 'start_date_after', 0, 0, 1, '', 1, 1, 1, 0)
+         .      $form->selectDate(dol_mktime(0, 0, 0, GETPOST('start_date_aftermonth'), GETPOST('start_date_afterday'), GETPOST('start_date_afteryear')), 'start_date_after', 0, 0, 1, '', 1, 1, 0)
          .      '<br/>'
          .      $langs->trans('FilterDateStartBefore')
-         .      $form->select_date(dol_mktime(23, 59, 59, GETPOST('start_date_beforemonth'), GETPOST('start_date_beforeday'), GETPOST('start_date_beforeyear')), 'start_date_before', 0, 0, 1, '', 1, 1, 1, 0)
+         .      $form->selectDate(dol_mktime(23, 59, 59, GETPOST('start_date_beforemonth'), GETPOST('start_date_beforeday'), GETPOST('start_date_beforeyear')), 'start_date_before', 0, 0, 1, '', 1, 1, 0)
          .   '</td>'
          .'</tr>';
     echo  '<tr>'
         .   '<td>' . $langs->trans('FilterDateEndAfter') . '</td>'
         .   '<td>'
-        .      $form->select_date(dol_mktime(0, 0, 0, GETPOST('end_date_aftermonth'), GETPOST('end_date_afterday'), GETPOST('end_date_afteryear')), 'end_date_after', 0, 0, 1, '', 1, 1, 1, 0)
+        .      $form->selectDate(dol_mktime(0, 0, 0, GETPOST('end_date_aftermonth'), GETPOST('end_date_afterday'), GETPOST('end_date_afteryear')), 'end_date_after', 0, 0, 1, '', 1, 1, 0)
         .      '<br/>'
         .      $langs->trans('FilterDateEndBefore')
-        .      $form->select_date(dol_mktime(23, 59, 59, GETPOST('end_date_beforemonth'), GETPOST('end_date_beforeday'), GETPOST('end_date_beforeyear')), 'end_date_before', 0, 0, 1, '', 1, 1, 1, 0)
+        .      $form->selectDate(dol_mktime(23, 59, 59, GETPOST('end_date_beforemonth'), GETPOST('end_date_beforeday'), GETPOST('end_date_beforeyear')), 'end_date_before', 0, 0, 1, '', 1, 1, 0)
         .   '</td>'
         .'</tr>';
 }
