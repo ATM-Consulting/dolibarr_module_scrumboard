@@ -198,4 +198,17 @@ class ScrumboardTest extends CommonClassTest
 		$this->assertNotEquals(999999, (int) $check->planned_workload);
 		$this->assertLessThanOrEqual(100, (int) $check->progress);
 	}
+
+	public function testJsContextKeysAreProvidedByThePage()
+	{
+		$js = file_get_contents(dirname(__FILE__).'/../../js/scrumboard.js');
+		$page = file_get_contents(dirname(__FILE__).'/../../scrum.php');
+
+		$this->assertStringNotContainsString('<?php', $js);
+		preg_match_all('/scrumboardContext\(\)\.(?:(urls|texts)\.)?(\w+)/', $js, $matches, PREG_SET_ORDER);
+		$this->assertNotEmpty($matches);
+		foreach ($matches as $match) {
+			$this->assertStringContainsString("'".$match[2]."' =>", $page, 'context key missing in scrum.php: '.$match[2]);
+		}
+	}
 }

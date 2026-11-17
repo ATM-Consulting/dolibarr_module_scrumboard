@@ -1,53 +1,44 @@
-<?php
 /* Copyright (C) 2025 ATM Consulting
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-	if (!defined('NOCSRFCHECK')) define('NOCSRFCHECK', 1);
-	if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
 
-	$res = @include '../../main.inc.php'; // From htdocs directory
-	if (!$res) {
-		$res = @include '../../../main.inc.php'; // From "custom" directory
+/**
+ * \file    js/scrumboard.js
+ * \ingroup scrumboard
+ * \brief   Behaviour of the scrumboard page. Texts, urls, token and options come from the JSON block #scrumboard-context.
+ */
+
+let scrumboardContextCache = null;
+
+function scrumboardContext() {
+	if (scrumboardContextCache === null) {
+		const element = document.getElementById('scrumboard-context');
+		try {
+			scrumboardContextCache = element ? JSON.parse(element.textContent) : {};
+		} catch (error) {
+			scrumboardContextCache = {};
+		}
 	}
-	if (!$res) {
-		die('Include of main fails');
-	}
-	require_once __DIR__.'/../lib/scrumboard.lib.php';
-	require_once __DIR__.'/../class/scrumboard.class.php';
-	include_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-	include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
-	$task = new Task($db);
-	$extrafieldstask = new ExtraFields($db);
-	$extrafieldstask->fetch_name_optionals_label($task->table_element);
-	header('Content-type: text/javascript');
+	return scrumboardContextCache;
+}
 
-?>
-/* <script type="text/javascript"> */
 
 jQuery.ajaxPrefilter(function (options) {
 	if (options.url && options.url.indexOf('script/interface.php') !== -1) {
-		options.data = (options.data ? options.data + '&' : '') + 'token=<?php echo urlencode(currentToken()); ?>';
+		options.data = (options.data ? options.data + '&' : '') + 'token=' + encodeURIComponent(scrumboardContext().token);
 	}
 });
 
 (function ($) {
 	$.fn.serializeFormJSON = function () {
 
-		var o = {};
-		var a = this.serializeArray();
+		let o = {};
+		let a = this.serializeArray();
 		$.each(a, function () {
 			if (o[this.name]) {
 				if (!o[this.name].push) {
@@ -96,7 +87,7 @@ function project_velocity(id_project) {
 function project_get_tasks(id_project, status) {
 	$('ul[rel="'+status+'"]').empty();
 
-	var data = $('#scrum_filter_by_user').serializeFormJSON();
+	let data = $('#scrum_filter_by_user').serializeFormJSON();
 	data.get = 'tasks';
 	data.status = status;
 	data.id_project = id_project;
@@ -113,23 +104,20 @@ function project_get_tasks(id_project, status) {
 			return;
 		}
 		$.each(tasks, function(i, task) {
-			var l_status = status;
+			let l_status = status;
 			// Si on utilise la conf de backlog et review, il faut tester si le scrum_status est vide pour mettre la tache dans la colonne la plus à gauche par défaut (test à faire unique si conf activé sinon on perd les taches sans scrum_status si désactivé)
 			// TODO: Voir avec Geoffrey pour l'avenir de la conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN
-			if(status == 'todo' && (task.scrum_status =='backlog' <?php if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) echo '|| task.scrum_status == ""'; ?> ) ) {
+			if(status == 'todo' && (task.scrum_status =='backlog' || (scrumboardContext().addBacklogReviewColumn && task.scrum_status == "") ) ) {
 				l_status = 'backlog';
 			}
 			else if(status == 'finish' && task.scrum_status =='review' ) {
 				l_status = 'review';
 			}
 			else if(status == 'unknownColumn') {
-				<?php
-				$scrumColumn = new ScrumboardColumn;
-				$scrumColumn->LoadAllBy($db, array('entity'=>$conf->entity));
-				print 'l_status = "'.$scrumColumn->getDefaultColumn().'";';
-				?>
+				l_status = scrumboardContext().defaultColumn;
 			}
 
+			let $ul;
 			if($('tr[project-id='+task.fk_project+'][story-k='+task.story_k+']').length>0) {
 				$ul = $('tr[project-id='+task.fk_project+'][story-k='+task.story_k+']').find('ul[rel="'+l_status+'"]');
 			}
@@ -156,14 +144,7 @@ function project_create_task(id_project) {
 	})
 	.done(function (task) {
 
-		<?php
-		// TODO: Conf SCRUM_ADD_BACKLOG_REVIEW_COLUMN !
-		if (getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN')) {
-			echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=backlog]\')';
-		} else {
-			echo '$ul = $(\'tr[default-k=1]\').find(\'ul[rel=todo]\')';
-		}
-		?>
+		const $ul = $('tr[default-k=1]').find('ul[rel=' + (scrumboardContext().addBacklogReviewColumn ? 'backlog' : 'todo') + ']');
 
 
 		project_draw_task(id_project, task, $ul);
@@ -173,7 +154,7 @@ function project_create_task(id_project) {
 }
 
 function project_draw_task(id_project, task, ul) {
-	var id = task.id;
+	let id = task.id;
 
 	if($('#task-'+id).length == 0) { // Si tâche déjà affichée, on ne clone pas le noeud
 		$('#task-blank').clone().attr('id', 'task-'+id).appendTo(ul);
@@ -201,7 +182,7 @@ function project_refresh_task(id_project, task) {
 			$target.show().prev().show();
 
 			let icon = $target.find('i');
-			icon.removeClass().addClass('fa fa-eye-slash fa-lg').attr('title', '<?php print $langs->trans('Hide'); ?>');
+			icon.removeClass().addClass('fa fa-eye-slash fa-lg').attr('title', scrumboardContext().texts.hide);
 
 
 		}
@@ -211,18 +192,18 @@ function project_refresh_task(id_project, task) {
 
 	}
 
-	// Generate js var with all scrumboard project to showdesc
-	var TShowDesc = (<?php echo json_encode($_SESSION['scrumboard']['showdesc']); ?>);
+	// Generate js variable with all scrumboard project to showdesc
+	const TShowDesc = scrumboardContext().showDesc || {};
 
 	$item.attr('task-id', task.id);
 
 	$item.removeClass('idea todo inprogress finish backlog review');
 	$item.addClass(task.status);
 
-	var progress= Math.round(task.progress / 5) * 5 ; // round 5
+	let progress= Math.round(task.progress / 5) * 5 ; // round 5
 	$item.find('.task-progress select').val( progress ).attr('task-id', task.id).off( "change").on("change", function() {
-		var id_projet = $('#scrum').attr('id_projet');
-		var id_task = $(this).attr('task-id');
+		let id_projet = $('#scrum').attr('id_projet');
+		let id_task = $(this).attr('task-id');
 		task=project_get_task(id_projet, id_task);
 		task.progress = parseInt($(this).val());
 		task.status = 'inprogress';
@@ -254,7 +235,7 @@ function project_refresh_task(id_project, task) {
 	}
 		$item.find('.task-extrafields').html(task.options_display);
 
-	$item.find('.task-ref a').html(task.ref).attr("href", '<?php echo dol_buildpath('/projet/tasks/task.php', 1) ?>?withproject=1&id='+task.id);
+	$item.find('.task-ref a').html(task.ref).attr("href", scrumboardContext().urls.task + '?withproject=1&id='+task.id);
 	$item.find('.task-users-affected').html(task.internal_contacts).append(task.external_contacts);
 	if (task.formatted_date_start_end) {
 		$item.find('.task-dates').html('<span>' + task.formatted_date_start_end + '</span>');
@@ -273,28 +254,24 @@ function project_refresh_task(id_project, task) {
 		pop_contact( $('#scrum').attr('id_projet'), task.id );
 	});
 
-	if(task.origin == 'order') $item.find('.task-origin a').attr('href', '<?php echo dol_buildpath('commande/card.php', 1); ?>?id='+task.origin_id);
-	else if(task.origin == 'propal') $item.find('.task-origin a').attr('href', '<?php echo dol_buildpath('comm/propal/card.php', 1); ?>?id='+task.origin_id);
+	if(task.origin == 'order') $item.find('.task-origin a').attr('href', scrumboardContext().urls.order + '?id='+task.origin_id);
+	else if(task.origin == 'propal') $item.find('.task-origin a').attr('href', scrumboardContext().urls.propal + '?id='+task.origin_id);
 	else $item.find('.task-origin a').remove();
 
-	<?php
-	if (getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT')) {
-		print ' $item.find(".task-add-contact a").attr("href", "'.dol_buildpath('scrumboard/scrum.php', 1).'?action=addressourcetotask&id="+ $("#scrum").attr("id_projet") + "&id_task=" + task.id + "&token='.newToken().'"); ';
+	if (scrumboardContext().showLinkedContact) {
+		$item.find(".task-add-contact a").attr("href", scrumboardContext().urls.scrum + "?action=addressourcetotask&id=" + $("#scrum").attr("id_projet") + "&id_task=" + task.id + "&token=" + scrumboardContext().pageToken);
 	}
-	?>
 
-	<?php if (getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
-	<!--  Commentary conf -->
+	if (scrumboardContext().allowComment) {
 	$item.find('.task-comment span').html(task.nbcomment).attr('task-id', task.id);
 
 	$item.find('.task-comment').off('click').on("click", function() {
 		pop_comment( $('#scrum').attr('id_projet'), $(this).find('span').attr('task-id'));
 	});
-	<!--  fin conf -->
-	<?php } ?>
+	}
 
 
-	var percent_progress = Math.round(task.duration_effective / task.planned_workload * 100);
+	let percent_progress = Math.round(task.duration_effective / task.planned_workload * 100);
 	if(percent_progress > 100) {
 		$item.find('div.progressbar').css('background-color', '#dd0000');
 		$item.find('div.progressbar').css('width', '100%');
@@ -315,7 +292,7 @@ function project_refresh_task(id_project, task) {
 
 	if(progress<100 && (task.scrum_status=='todo' || task.scrum_status=='inprogress' ) ) {
 
-		var t = new Date().getTime() /1000;
+		let t = new Date().getTime() /1000;
 
 		if( task.time_date_end>0 && task.time_date_end < t ) {
 			$item.addClass('late-time');
@@ -330,7 +307,7 @@ function project_refresh_task(id_project, task) {
 }
 
 function project_get_task(id_project, id_task) {
-	var taskReturn="";
+	let taskReturn="";
 	$.ajax({
 		url : "./script/interface.php"
 		,data: {
@@ -375,12 +352,12 @@ function project_init_change_type(id_project) {
 
 	  }
 	  ,update:function(event,ui) {
-		  var sortedIDs = $( this ).sortable( "toArray" );
+		  let sortedIDs = $( this ).sortable( "toArray" );
 
-		  var TTaskID=[];
+		  let TTaskID=[];
 		  $.each(sortedIDs, function(i, id) {
 
-			  taskid = $('#'+id).attr('task-id');
+			  const taskid = $('#'+id).attr('task-id');
 			  TTaskID.push( taskid );
 		  });
 
@@ -448,13 +425,9 @@ function project_develop_task(id_task) {
 }
 
 function project_loadTasks(id_projet) {
-	<?php
-	$scrumboardColumn = new ScrumboardColumn;
-	$TColumn = $scrumboardColumn->getTColumnOrder();
-	foreach ($TColumn as $column) {
-		echo 'project_get_tasks(id_projet ,  \''.$column->code.'\');';
-	}
-	?>
+	scrumboardContext().columns.forEach(function (code) {
+		project_get_tasks(id_projet, code);
+	});
 	project_get_tasks(id_projet , 'unknownColumn');
 }
 function create_task(id_projet) {
@@ -462,7 +435,7 @@ function create_task(id_projet) {
 	if($('#dialog-create-task').length==0) {
 		$('body').append('<div id="dialog-create-task"></div>');
 	}
-	var url ="<?php echo  dol_buildpath('/projet/tasks.php', 1) ?>?action=create&id="+id_projet
+	let url =scrumboardContext().urls.tasks + "?action=create&id="+id_projet
 
 	$('#dialog-create-task').load(url+" div.fiche form",function() {
 
@@ -481,7 +454,7 @@ function create_task(id_projet) {
 		});
 
 		$(this).dialog({
-			title: "<?php echo html_entity_decode($langs->trans('AddTask')) ?>"
+			title: scrumboardContext().texts.addTask
 			,width:800
 			,modal:true
 		});
@@ -493,16 +466,16 @@ function create_task(id_projet) {
 function pop_contact(id_project, id_task) {
 
 	$.ajax({
-		url: '<?php echo dol_buildpath('/scrumboard/scrum.php', 1); ?>?id_task=' + id_task + '&action=addressourcetotask&token=<?php echo newToken() ?>&ajaxcall=1&id=' + id_project
+		url: scrumboardContext().urls.scrum + '?id_task=' + id_task + '&action=addressourcetotask&token=' + scrumboardContext().pageToken + '&ajaxcall=1&id=' + id_project
 		, method: 'GET'
 		, dataType: 'html'
 		, success: function(data)
 		{
 			$('#saisie').empty();
 			$(data).find('#form-add-ressource-task-' + id_task).first().appendTo('#saisie');
-			var fk_user = $("#fk_user").val();
-			var input = $('<input type="hidden" name="fk_user" value="'+fk_user+'" >')
-			var form = $('#saisie').find('form');
+			let fk_user = $("#fk_user").val();
+			let input = $('<input type="hidden" name="fk_user" value="'+fk_user+'" >')
+			let form = $('#saisie').find('form');
 
 			form.append(input);
 
@@ -518,17 +491,14 @@ function pop_contact(id_project, id_task) {
 
 
 function pop_time(id_project, id_task) {
-	let path = '<?php echo dol_buildpath('/projet/tasks/time.php', 1); ?>?id='+id_task;
-	<?php
-	echo "path += '&action=createtime&token=".newToken()."';";
-	?>
+	let path = scrumboardContext().urls.time + '?id=' + id_task + '&action=createtime&token=' + scrumboardContext().pageToken;
 		$("#saisie")
 					.load(path+' div.fiche form'
 					,function() {
 						$('textarea[name=timespent_note]').attr('cols',25).focus();
 					$('#time').datepicker({
 											showOn: 'button',
-											buttonImage: '<?php echo DOL_URL_ROOT."/theme/".$conf->theme."/img/object_calendarday.png"; ?>',
+											buttonImage: scrumboardContext().urls.calendarIcon,
 											buttonImageOnly: true
 											});
 
@@ -573,12 +543,12 @@ function pop_time(id_project, id_task) {
 								// ERror case
 													$.jnotify(message,'error');
 								}else{
-									$.jnotify('<?php echo $langs->trans('TimeAdded') ?>');
+									$.jnotify(scrumboardContext().texts.timeAdded);
 								}
 							}
 							else
 							{
-								$.jnotify('<?php echo $langs->trans('TimeAdded') ?>');
+								$.jnotify(scrumboardContext().texts.timeAdded);
 							}
 
 						});
@@ -603,13 +573,11 @@ function pop_time(id_project, id_task) {
 				});
 }
 
-<?php if (getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK')) { ?>
-<!--  Commentary conf -->
 
 
 function pop_comment(id_project, id_task) {
 	$("#saisie")
-				.load('<?php echo dol_buildpath('/projet/tasks/comment.php', 1) ?>?id='+id_task+' #comment'
+				.load(scrumboardContext().urls.comment + '?id=' + id_task+' #comment'
 				,function() {
 					$('textarea[name="comment_description"]').attr('cols',25).focus();
 
@@ -638,10 +606,10 @@ function pop_comment(id_project, id_task) {
 
 								jEnd = data.indexOf('"error"', jStart) - 10;
 								message = data.substr(jStart,  jEnd - jStart).replace(/\\'/g,'\'');
-								$.jnotify('<?php echo $langs->trans('CommentAdded') ?>');
+								$.jnotify(scrumboardContext().texts.commentAdded);
 							}
 							else {
-								$.jnotify('<?php echo $langs->trans('CommentAdded') ?>', "ok");
+								$.jnotify(scrumboardContext().texts.commentAdded, "ok");
 								project_velocity(id_project);
 							}
 
@@ -664,12 +632,10 @@ function pop_comment(id_project, id_task) {
 					,title:$('li[task-id='+id_task+'] span[rel=label]').text()
 				});
 }
-<!--  fin conf -->
-<?php } ?>
 
 function reset_the_dates(id_project) {
 
-	var velocity = parseFloat($('#current-velocity').val());
+	let velocity = parseFloat($('#current-velocity').val());
 	$.ajax({
 		url : "./script/interface.php"
 		,data: {
@@ -695,22 +661,22 @@ function reset_date_task(id_project) {
 			,minWidth:400
 			,minHeight:200
 			,buttons: [
-				{ text: "<?php echo $langs->trans('Yes'); ?>", click: function() { reset_the_dates(id_project); $( this ).dialog( "close" ); } }
-				, { text: "<?php echo $langs->trans('No'); ?>", click: function() { $( this ).dialog( "close" ); } }
+				{ text: scrumboardContext().texts.yes, click: function() { reset_the_dates(id_project); $( this ).dialog( "close" ); } }
+				, { text: scrumboardContext().texts.no, click: function() { $( this ).dialog( "close" ); } }
 			]
 	});
 }
 
 function add_storie(id_project) {
 
-	var storie_name = $('#newStorieName').val();
-	var storie_order = parseInt($('#add_storie_k').val());
-	var add_storie_date_startday = $('#add_storie_date_startday').val();
-	var add_storie_date_startmonth = $('#add_storie_date_startmonth').val();
-	var add_storie_date_startyear = $('#add_storie_date_startyear').val();
-	var add_storie_date_endday = $('#add_storie_date_endday').val();
-	var add_storie_date_endmonth = $('#add_storie_date_endmonth').val();
-	var add_storie_date_endyear = $('#add_storie_date_endyear').val();
+	let storie_name = $('#newStorieName').val();
+	let storie_order = parseInt($('#add_storie_k').val());
+	let add_storie_date_startday = $('#add_storie_date_startday').val();
+	let add_storie_date_startmonth = $('#add_storie_date_startmonth').val();
+	let add_storie_date_startyear = $('#add_storie_date_startyear').val();
+	let add_storie_date_endday = $('#add_storie_date_endday').val();
+	let add_storie_date_endmonth = $('#add_storie_date_endmonth').val();
+	let add_storie_date_endyear = $('#add_storie_date_endyear').val();
 
 	$.ajax({
 		url : "./script/interface.php"
@@ -739,8 +705,8 @@ function add_storie_task(id_project) {
 			,minWidth:400
 			,minHeight:100
 			,buttons: [
-				{ text: "<?php echo $langs->trans('Add'); ?>", click: function() { add_storie(id_project); $( this ).dialog( "close" ); location.href = location.pathname+'?id='+id_project; } }
-				, { text: "<?php echo $langs->trans('Cancel'); ?>", click: function() { $( this ).dialog( "close" ); } }
+				{ text: scrumboardContext().texts.add, click: function() { add_storie(id_project); $( this ).dialog( "close" ); location.href = location.pathname+'?id='+id_project; } }
+				, { text: scrumboardContext().texts.cancel, click: function() { $( this ).dialog( "close" ); } }
 			]
 	});
 }
@@ -767,18 +733,18 @@ function toggle_visibility(id_project, storie_order) {
 
 	// On récupère le tr à cacher/afficher
 	let tr = $('tr.hiddable[story-k='+storie_order+'][project-id='+id_project+']');
-	var icon = $('i[data-story-k='+storie_order+'][data-project-id='+id_project+']');
+	let icon = $('i[data-story-k='+storie_order+'][data-project-id='+id_project+']');
 
 	// S'il n'est pas encore caché
 	if(tr.attr('style').indexOf('display') < 0) {
 		tr.hide(200);
 		// On change l'image du bouton
-		icon.removeClass().addClass('fa fa-eye fa-lg').attr('title', '<?php print $langs->trans('Show'); ?>');
+		icon.removeClass().addClass('fa fa-eye fa-lg').attr('title', scrumboardContext().texts.show);
 	}
 	else {
 		tr.show(200);
 		// On change l'image du bouton
-		icon.removeClass().addClass('fa fa-eye-slash fa-lg').attr('title', '<?php print $langs->trans('Hide'); ?>');
+		icon.removeClass().addClass('fa fa-eye-slash fa-lg').attr('title', scrumboardContext().texts.hide);
 	}
 }
 
@@ -803,3 +769,15 @@ function state_filter_on_change() {
 		$('#state_id').parent().html(html);
 	});
 }
+
+$(function () {
+	const context = scrumboardContext();
+	if (context.columnWidth) {
+		document.documentElement.style.setProperty('--scrum-column-width', context.columnWidth + '%');
+	}
+	if (document.getElementById('scrumboard-context')) {
+		project_loadTasks(context.projectId);
+		project_init_change_type(context.projectId);
+		project_velocity(context.projectId);
+	}
+});
