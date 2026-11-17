@@ -349,7 +349,12 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	}
 
 	if(!empty($values)){
-		$allowedValues = array_intersect_key($values, array_flip(array('label', 'progress', 'status', 'story_k', 'scrum_status')));
+		$allowedValues = array_filter(
+			array_intersect_key($values, array_flip(array('label', 'progress', 'status', 'story_k', 'scrum_status'))),
+			function ($value) {
+				return $value !== '' && $value !== null;
+			}
+		);
 		$allowedValues['progress'] = isset($allowedValues['progress']) ? max(0, min(100, (int) $allowedValues['progress'])) : $task->progress;
 		_set_values($task, $allowedValues);
 		$values = $allowedValues + array('status' => '', 'story_k' => 0, 'scrum_status' => '');
