@@ -52,7 +52,7 @@ if (!isModEnabled('scrumboard') || !$user->hasRight('projet', 'lire')) {
 	_deny('Access denied');
 }
 $postedToken = GETPOST('token', 'alpha');
-if (!hash_equals(newToken(), $postedToken) && !hash_equals(currentToken(), $postedToken)) {
+if ($postedToken === '' || !hash_equals(currentToken(), $postedToken)) {
 	_deny('Bad token');
 }
 
