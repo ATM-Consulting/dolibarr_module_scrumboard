@@ -22,13 +22,32 @@
  */
 
 
-	require('config.php');
-	dol_include_once('/scrumboard/lib/scrumboard.lib.php');
-	dol_include_once('/scrumboard/class/scrumboard.class.php');
+	$res = @include '../main.inc.php'; // From htdocs directory
+	if (!$res) {
+		$res = @include '../../main.inc.php'; // From "custom" directory
+	}
+	if (!$res) {
+		die('Include of main fails');
+	}
+	require_once __DIR__.'/lib/scrumboard.lib.php';
+	require_once __DIR__.'/class/scrumboard.class.php';
 	require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 	require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
     $hookmanager->initHooks(array('scrumboardcard'));
+
+	if (!isModEnabled('scrumboard') || !$user->hasRight('projet', 'lire')) {
+		accessforbidden();
+	}
+	if (GETPOST('id', 'int') > 0 && !checkUserAccessToObject($user, array('projet'), GETPOST('id', 'int'))) {
+		accessforbidden();
+	}
+	if (GETPOST('ref', 'aZ09') !== '') {
+		$projectByRef = new Project($db);
+		if ($projectByRef->fetch(0, GETPOST('ref', 'aZ09')) > 0 && !checkUserAccessToObject($user, array('projet'), (int) $projectByRef->id)) {
+			accessforbidden();
+		}
+	}
 
 	$TArrayOfCss = array();
 	$TArrayOfCssClasses = array();
@@ -63,7 +82,7 @@
 		$TColumn[] = (object) array('code' => 'unknownColumn', 'label' => $TColumn[0]->label);
 		$fk_user = GETPOST('fk_user', 'int');
 		$fk_soc = GETPOST('fk_soc', 'int');
-		$soc_type = GETPOST('soc_type');
+		$soc_type = GETPOST('soc_type', 'aZ09');
 
 		// CMMCM pour rester iso avec l’écran
 
@@ -202,7 +221,7 @@
 							if (is_array($field_labels)) {
 								$keyList .= ', ' . implode(', ', $field_labels);
 							}
-							$sql = 'SELECT ' . $keyList . ' FROM ' . MAIN_DB_PREFIX . $infoFieldList[0];
+							$sql = 'SELECT ' . $keyList . ' FROM ' . $db->prefix() . $infoFieldList[0];
 							if (strpos($infoFieldList[4], 'extra') !== false) {
 								$sql .= ' as main';
 							}
@@ -304,22 +323,23 @@
 	llxHeader('', $langs->trans('Tasks') , '','',0,0, array('/scrumboard/script/scrum.js.php'), $TArrayOfCss, '', join(' ', $TArrayOfCssClasses));
 
 	$ref = GETPOST('ref', 'aZ09');
-	$id_projet = (int)GETPOST('id');
-	$action = GETPOST('action');
+	$id_projet = (int) GETPOST('id', 'int');
+	$action = GETPOST('action', 'aZ09');
 	$storie_k_toEdit = GETPOST('storie_k', 'int');
-	$confirm = GETPOST('confirm');
-	$storie_date_start = dol_mktime(12, 0, 0, GETPOST('storie_date_startmonth'), GETPOST('storie_date_startday'), GETPOST('storie_date_startyear'));
-	$storie_date_end = dol_mktime(12, 0, 0, GETPOST('storie_date_endmonth'), GETPOST('storie_date_endday'), GETPOST('storie_date_endyear'));
+	$confirm = GETPOST('confirm', 'alpha');
+	$storie_date_start = dol_mktime(12, 0, 0, GETPOST('storie_date_startmonth', 'int'), GETPOST('storie_date_startday', 'int'), GETPOST('storie_date_startyear', 'int'));
+	$storie_date_end = dol_mktime(12, 0, 0, GETPOST('storie_date_endmonth', 'int'), GETPOST('storie_date_endday', 'int'), GETPOST('storie_date_endyear', 'int'));
 	$id_task =  GETPOST('id_task', 'int');
-	$userid = GETPOST('userid');
+	$userid = GETPOST('userid', 'int');
+
+	$canWriteProject = $id_projet > 0 && $user->hasRight('projet', 'creer') && checkUserAccessToObject($user, array('projet'), $id_projet);
 
 	if($userid <= 0)
 	{
 		$userid = $user->id;
 	}
 
-	$story = new TStory;
-	$PDOdb = new TPDOdb;
+	$story = new TStory($db);
 	// Init new session var if not exist
 	if(empty($_SESSION['scrumboard']['showdesc'])) {
 		$_SESSION['scrumboard']['showdesc'] = array();
@@ -333,22 +353,23 @@
 	else if($action == "confirm_delete") {
 		echo $form->formconfirm($_SERVER['PHP_SELF'].'?id='.$id_projet.'&storie_k='.$storie_k_toEdit, $langs->trans('ConfirmDeleteStorie'), $langs->trans('DeleteStorie'), 'delete_storie', '', 0, 1);
 	}
-	else if($action == "delete_storie" && $confirm == 'yes') {
-		$story->loadStory($id_projet, $storie_k_toEdit);
-
-		$story->delete($PDOdb);
-	}
-	else if($action == 'save') {
-		if($storie_date_start > $storie_date_end) {
-			setEventMessage('DateStartAfterDateEnd', 'errors');
+	else if($action == "delete_storie" && $confirm == 'yes' && $canWriteProject) {
+		if ($story->loadStory($id_projet, $storie_k_toEdit) > 0 && $story->delete() < 0) {
+			setEventMessages($story->error, null, 'errors');
 		}
-		else {
-			$story->load($PDOdb, GETPOST('id_story'));
-			$story->label = GETPOST('storieName');
+	}
+	else if($action == 'save' && $canWriteProject) {
+		if($storie_date_start > $storie_date_end) {
+			setEventMessage($langs->trans('DateStartAfterDateEnd'), 'errors');
+		}
+		elseif ($story->load(GETPOST('id_story', 'int')) > 0 && $story->fk_projet == $id_projet) {
+			$story->label = GETPOST('storieName', 'alphanohtml');
 			$story->date_start = $storie_date_start;
 			$story->date_end = $storie_date_end;
 
-			$story->save($PDOdb);
+			if ($story->save() < 0) {
+				setEventMessages($story->error, null, 'errors');
+			}
 		}
 	}
 
@@ -461,6 +482,9 @@
 
 			$taskObject = new Task($db);
 			$resulttaskfetch = $taskObject->fetch($id_task);
+			if ($resulttaskfetch <= 0 || !checkUserAccessToObject($user, array('projet'), (int) $taskObject->fk_project)) {
+				accessforbidden();
+			}
 
 			$proj = new Project($db);
 			if ($taskObject->fk_project) $proj->fetch($taskObject->fk_project);
@@ -832,7 +856,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 		?>
 			<?php
     			if($action == 'addressourcetostorie' && $storie_k == $storie_k_toEdit) {
-    			    $storyToEdit = new TStory;
+    			    $storyToEdit = new TStory($db);
     			    $storyToEdit->loadStory($id_projet, $storie_k);
 
 
@@ -880,7 +904,7 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
     			    print '</div>';
     			}
 				elseif($action == 'edit' && $storie_k == $storie_k_toEdit) {
-					$storyToEdit = new TStory;
+					$storyToEdit = new TStory($db);
 					$storyToEdit->loadStory($id_projet, $storie_k);
 
 					print '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
@@ -1162,7 +1186,7 @@ function _printUserFilter($id_projet, $form)
 		echo '<tr><td>';
 		echo $langs->trans('UserFilter');
 		echo '</td><td>';
-		$fk_user = GETPOST('fk_user');
+		$fk_user = GETPOST('fk_user', 'int');
 		if (empty($id_projet) && empty($fk_user)) $fk_user = $user->id; // Si on selectionne vide dans le champ on aura -1
 
 		if (empty($id_projet) && !$user->hasRight('projet', 'all', 'lire') && getDolGlobalInt('GLOBAL_SB_PREFILTERED_ON_USER_RIGHTS')) // filtrage du scrumboard global sur le user courant si pas le droit de tout voir
@@ -1251,7 +1275,7 @@ function _printSocieteFilter($form)
 	echo $form->select_company(GETPOST('fk_soc'), 'fk_soc', '', 1);
 	echo '&nbsp;&nbsp;&nbsp;';
 
-	$soc_type = GETPOST('soc_type');
+	$soc_type = GETPOST('soc_type', 'aZ09');
 
 	echo '<label for="soc_type_onlycompany">'.$langs->trans('soc_type_onlycompany').'</label>&nbsp;<input type="radio" name="soc_type" value="onlycompany" id="soc_type_onlycompany" '.((empty($soc_type) || $soc_type === 'onlycompany') ? 'checked' : '').'>';
 	echo '&nbsp;&nbsp;<label for="soc_type_onlycompany">'.$langs->trans('soc_type_onlychildren').'</label>&nbsp;<input type="radio" name="soc_type" value="onlychildren" id="soc_type_onlychildren" '.(($soc_type === 'onlychildren') ? 'checked' : '').'>';

@@ -17,9 +17,15 @@
 	if (!defined('NOCSRFCHECK')) define('NOCSRFCHECK', 1);
 	if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
 
-	require '../config.php';
-	dol_include_once('/scrumboard/lib/scrumboard.lib.php');
-	dol_include_once('/scrumboard/class/scrumboard.class.php');
+	$res = @include '../../main.inc.php'; // From htdocs directory
+	if (!$res) {
+		$res = @include '../../../main.inc.php'; // From "custom" directory
+	}
+	if (!$res) {
+		die('Include of main fails');
+	}
+	require_once __DIR__.'/../lib/scrumboard.lib.php';
+	require_once __DIR__.'/../class/scrumboard.class.php';
 	include_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 	include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
@@ -30,6 +36,12 @@
 
 ?>
 /* <script type="text/javascript"> */
+
+jQuery.ajaxPrefilter(function (options) {
+	if (options.url && options.url.indexOf('script/interface.php') !== -1) {
+		options.data = (options.data ? options.data + '&' : '') + 'token=<?php echo urlencode(newToken()); ?>';
+	}
+});
 
 (function ($) {
 	$.fn.serializeFormJSON = function () {
@@ -113,8 +125,7 @@ function project_get_tasks(id_project, status) {
 			else if(status == 'unknownColumn') {
 				<?php
 				$scrumColumn = new ScrumboardColumn;
-				$PDOdb = new TPDOdb;
-				$scrumColumn->LoadAllBy($PDOdb, array('entity'=>$conf->entity));
+				$scrumColumn->LoadAllBy($db, array('entity'=>$conf->entity));
 				print 'l_status = "'.$scrumColumn->getDefaultColumn().'";';
 				?>
 			}
@@ -241,8 +252,7 @@ function project_refresh_task(id_project, task) {
 				}
 		});
 	}
-	//console.log(task.options_display);
-	$item.find('.task-extrafields').html(task.options_display);
+		$item.find('.task-extrafields').html(task.options_display);
 
 	$item.find('.task-ref a').html(task.ref).attr("href", '<?php echo dol_buildpath('/projet/tasks/task.php', 1) ?>?withproject=1&id='+task.id);
 	$item.find('.task-users-affected').html(task.internal_contacts).append(task.external_contacts);

@@ -21,24 +21,30 @@
  *	\ingroup	scrumboard
  *	\brief		Setup page for module scrumboard
  */
-require '../config.php';
-dol_include_once('/core/lib/admin.lib.php');
-dol_include_once('/core/class/extrafields.class.php');
+$res = @include '../../main.inc.php'; // From htdocs directory
+if (!$res) {
+	$res = @include '../../../main.inc.php'; // From "custom" directory
+}
+if (!$res) {
+	die('Include of main fails');
+}
+require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Access control
-if (! $user->admin) {
+if (!isModEnabled('scrumboard') || !$user->admin) {
     accessforbidden();
 }
 
 // Parameters
-$action = GETPOST('action', 'alpha');
+$action = GETPOST('action', 'aZ09');
 
-if (preg_match('/set_(.*)/',$action,$reg))
+if (preg_match('/^set_(SCRUM_DEFAULT_VELOCITY|SCRUM_DISPLAY_TASKS_EXTRAFIELDS)$/', $action, $reg))
 {
 	$code=$reg[1];
 	if ($code == 'SCRUM_DISPLAY_TASKS_EXTRAFIELDS')
 	{
-		$TtasksEF = GETPOST('SCRUM_DISPLAY_TASKS_EXTRAFIELDS');
+		$TtasksEF = array_map('trim', GETPOST('SCRUM_DISPLAY_TASKS_EXTRAFIELDS', 'array'));
 		if (empty($TtasksEF)){
 			$TtasksEF = array();
 		}
@@ -49,26 +55,11 @@ if (preg_match('/set_(.*)/',$action,$reg))
 			exit;
 		}
 	}
-	else if (dolibarr_set_const($db, $code, GETPOST($code), 'chaine', 0, '', $conf->entity) > 0)
+	else if (dolibarr_set_const($db, $code, GETPOST($code, 'alphanohtml'), 'chaine', 0, '', $conf->entity) > 0)
 	{
 
         setEventMessage( $langs->trans('RegisterSuccess') );
 		header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
-	}
-	else
-	{
-		dol_print_error($db);
-	}
-}
-
-if (preg_match('/del_(.*)/',$action,$reg))
-{
-	$code=$reg[1];
-	if (dolibarr_del_const($db, $code, 0) > 0)
-	{
-		setEventMessage( $langs->trans('RegisterSuccess') );
-		Header("Location: ".$_SERVER["PHP_SELF"]);
 		exit;
 	}
 	else

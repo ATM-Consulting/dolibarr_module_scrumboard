@@ -55,7 +55,7 @@ class modscrumboard extends DolibarrModules
 		// Module description, used if translation 'ModuleXXXDesc' not found
 		$this->description = "Module pour gérer les tâches projet sur une vue kanban";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '2.8.5';
+		$this->version = '2.8.6';
 		// Url to the file with the last version number of this module
 		require_once __DIR__ . '/../../class/techatm.class.php';
 		$this->url_last_version = \scrumboard\TechATM::getLastModuleVersionUrl($this);
@@ -189,10 +189,9 @@ class modscrumboard extends DolibarrModules
 			}
 		}
 
-		dol_include_once('/scrumboard/config.php');
-		dol_include_once('/scrumboard/script/create-maj-base.php');
-
 		$this->loadTables();
+
+		dol_include_once('/scrumboard/script/migration_stories.php');
 
 		dolibarr_set_const($this->db, 'SCRUM_DEFAULT_VELOCITY', 7, 'chaine', 1, 'Vélocité par défaut d\'un projet', 0);
 

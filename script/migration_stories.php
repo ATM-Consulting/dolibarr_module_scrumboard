@@ -21,53 +21,36 @@
  *	\brief      Project card
  */
 
-//require('config.php');
 set_time_limit(0);
 
-dol_include_once('/scrumboard/lib/scrumboard.lib.php');
-dol_include_once('/scrumboard/class/scrumboard.class.php');
+require_once __DIR__.'/../lib/scrumboard.lib.php';
+require_once __DIR__.'/../class/scrumboard.class.php';
 
 /**
  * Actions
  */
 global $db, $conf;
 
-$PDOdb = new TPDOdb;
 $error = 0;
 $TData = getData();
 foreach ($TData as $fk_project => $stories) {
-	if (empty($stories)) {
-		$PDOdb->beginTransaction();
+	$TStorieLabel = empty($stories) ? array('Sprint 1') : explode(',', $stories);
 
-		$story = new TStory;
-
+	$db->begin();
+	foreach ($TStorieLabel as $k => $storie_label) {
+		$story = new TStory($db);
 		$story->fk_projet = $fk_project;
-		$story->storie_order = 1;
-		$story->label = 'Sprint 1';
-		$resql = $story->save($PDOdb);
-
-		if ($resql) $PDOdb->commit();
-		else {
-			$PDOdb->rollBack();
+		$story->storie_order = $k + 1;
+		$story->label = trim($storie_label);
+		if ($story->save() <= 0) {
 			$error++;
 		}
+	}
+
+	if (empty($error)) {
+		$db->commit();
 	} else {
-		$TStorieLabel = explode(',', $stories);
-		$PDOdb->beginTransaction();
-		// Sinon, on lui réaffecte ceux qu'il utilisait
-		foreach ($TStorieLabel as $k => $storie_label) {
-			$story = new TStory;
-
-			$story->fk_projet = $fk_project;
-			$story->storie_order = $k+1;
-			$story->label = trim($storie_label);
-			$resql = $story->save($PDOdb);
-
-			if (! $resql) $error++;
-		}
-
-		if (empty($error)) $PDOdb->commit();
-		else $PDOdb->rollBack();
+		$db->rollback();
 	}
 }
 
@@ -79,13 +62,6 @@ if (empty($error)) {
 	}
 }
 
-// Ajout d'un index sur le champ "storie_order"
-$sql = 'ALTER TABLE '.MAIN_DB_PREFIX.'projet_storie ADD INDEX idx_llx_projet_storie_story_order (storie_order)';
-$resql = $db->query($sql);
-if (! $resql && $db->errno() != 'DB_ERROR_KEY_NAME_ALREADY_EXISTS') {
-	$errordb ++;
-	$errors[] = $db->lasterror;
-}
 /**
  * Get data from database
  *
@@ -104,9 +80,9 @@ function getData()
 
 	// Sélectionne tous les projets existants qui n'ont pas de sprint de créé dans la table "projet_storie"
 	$sql = 'SELECT p.rowid, pe.stories';
-	$sql .= ' FROM '.MAIN_DB_PREFIX.'projet AS p';
-	$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'projet_extrafields AS pe ON pe.fk_object=p.rowid';
-	$sql .= ' WHERE p.rowid NOT IN (SELECT fk_projet FROM '.MAIN_DB_PREFIX.'projet_storie)';
+	$sql .= ' FROM '.$db->prefix().'projet AS p';
+	$sql .= ' LEFT JOIN '.$db->prefix().'projet_extrafields AS pe ON pe.fk_object=p.rowid';
+	$sql .= ' WHERE p.rowid NOT IN (SELECT fk_projet FROM '.$db->prefix().'projet_storie)';
 
 	$resql = $db->query($sql);
 
