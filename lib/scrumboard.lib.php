@@ -71,20 +71,20 @@ function scrum_getVelocity(&$db, $id_project) {
 
 	if(intval(DOL_VERSION) < 18) {
 		$res = $db->query("SELECT SUM(tt.task_duration) as task_duration
-		FROM ".MAIN_DB_PREFIX."projet_task_time tt LEFT JOIN ".MAIN_DB_PREFIX."projet_task t ON (tt.fk_task=t.rowid)
-		WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
+		FROM ".$db->prefix()."projet_task_time tt LEFT JOIN ".$db->prefix()."projet_task t ON (tt.fk_task=t.rowid)
+		WHERE tt.task_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".((int) $id_project));
 	}
 	else {
 		$res = $db->query('SELECT SUM(tt.element_duration) as task_duration
-		FROM '.MAIN_DB_PREFIX.'element_time tt LEFT JOIN '.MAIN_DB_PREFIX."projet_task t ON (t.rowid=tt.fk_element AND tt.elementtype = 'task')
-		WHERE tt.element_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".$id_project);
+		FROM '.$db->prefix().'element_time tt LEFT JOIN '.$db->prefix()."projet_task t ON (t.rowid=tt.fk_element AND tt.elementtype = 'task')
+		WHERE tt.element_date>='".date('Y-m-d', $t2week)."' AND t.fk_projet=".((int) $id_project));
 	}
 
 	$velocity = 0;
 	if($res && $obj=$db->fetch_object($res)) {
 		 $velocity = round($obj->task_duration / ((time() - $t2week) / 86400));
 	}elseif(!$res){
-		error_log("scrum_getVelocity sql fail : ".$db->error());
+		dol_syslog('scrum_getVelocity sql fail : '.$db->lasterror(), LOG_ERR);
 	}
 
 	if($velocity==0)$velocity = (int) getDolGlobalInt('SCRUM_DEFAULT_VELOCITY') * 3600;
@@ -98,7 +98,7 @@ function getAllTaskInStory($fk_project, $story) {
 
     // Sélectionne toutes les taches existantes liées à une story
     $sql = 'SELECT t.rowid';
-    $sql .= ' FROM '.MAIN_DB_PREFIX.'projet_task AS t';
+    $sql .= ' FROM '.$db->prefix().'projet_task AS t';
     $sql .= ' WHERE t.story_k = '.intval($story).' AND t.fk_projet = '.intval($fk_project);
 
     $resql = $db->query($sql);
@@ -149,35 +149,42 @@ function getSQLForTasks(
 
 	dol_include_once('scrumboard/class/scrumboard.class.php');
 
-	$sql = 'SELECT DISTINCT pt.rowid, pt.story_k, pt.scrum_status, pt.rang
-			FROM '.MAIN_DB_PREFIX.'projet_task pt
-			INNER JOIN '.MAIN_DB_PREFIX.'projet p ON (p.rowid = pt.fk_projet)';
+	$id_project = (int) $id_project;
+	$fk_user = (int) $fk_user;
+	$fk_soc = (int) $fk_soc;
+	$country_filter = (int) $country_filter;
+	$state_filter = (int) $state_filter;
+	$soc_type = in_array($soc_type, array('onlycompany', 'onlychildren', 'both'), true) ? $soc_type : '';
 
-	if (!empty($search_array_options)) $sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'projet_task_extrafields ef ON (ef.fk_object = pt.rowid)';
+	$sql = 'SELECT DISTINCT pt.rowid, pt.story_k, pt.scrum_status, pt.rang
+			FROM '.$db->prefix().'projet_task pt
+			INNER JOIN '.$db->prefix().'projet p ON (p.rowid = pt.fk_projet)';
+
+	if (!empty($search_array_options)) $sql.= ' INNER JOIN '.$db->prefix().'projet_task_extrafields ef ON (ef.fk_object = pt.rowid)';
 
 	if(empty($id_project) && $status != 'unknownColumn')
 	{
-		$sql.= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet_storie ps ON (ps.fk_projet = pt.fk_projet AND ps.storie_order = pt.story_k)';
+		$sql.= ' INNER JOIN ' . $db->prefix() . 'projet_storie ps ON (ps.fk_projet = pt.fk_projet AND ps.storie_order = pt.story_k)';
 	}
 
 	if (getDolGlobalInt('SCRUM_FILTER_BY_USER_ENABLE') && $fk_user > 0)
 	{
-		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'element_contact ec ON (ec.element_id = pt.rowid)';
-		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'c_type_contact tc ON (tc.rowid = ec.fk_c_type_contact)';
+		$sql.= ' INNER JOIN '.$db->prefix().'element_contact ec ON (ec.element_id = pt.rowid)';
+		$sql.= ' INNER JOIN '.$db->prefix().'c_type_contact tc ON (tc.rowid = ec.fk_c_type_contact)';
 	}
 	if ((!empty($country_filter) || !empty($state_filter)) && !empty($search_array_options))
 	{
-		$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'societe soc ON (ef.fk_etablissement = soc.rowid)';
+		$sql.= ' INNER JOIN '.$db->prefix().'societe soc ON (ef.fk_etablissement = soc.rowid)';
 	}
 
 	if($status == 'unknownColumn') {
-		$sql .= ' WHERE (scrum_status NOT IN (SELECT code FROM '.MAIN_DB_PREFIX.'c_scrum_columns WHERE active=1) OR scrum_status IS NULL)';
+		$sql .= ' WHERE (scrum_status NOT IN (SELECT code FROM '.$db->prefix().'c_scrum_columns WHERE active=1) OR scrum_status IS NULL)';
 	}
 	else {
 		$sql.= ' WHERE 1 ';
 
 		if (!empty($status)) {
-			$sql.= ' AND ((scrum_status IS NOT NULL AND scrum_status = "'.$db->escape($status).'")';
+			$sql.= ' AND ((scrum_status IS NOT NULL AND scrum_status = \''.$db->escape($status).'\')';
 			if      ($status=='ideas')      $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL) AND datee IS NULL)';
 			else if ($status=='todo' || getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN') && $status=='backlog')  $sql.= ' OR (scrum_status IS NULL AND (progress = 0 OR progress IS NULL))';
 			else if ($status=='inprogress') $sql.= ' OR (scrum_status IS NULL AND  progress > 0 AND progress < 100)';
@@ -186,7 +193,13 @@ function getSQLForTasks(
 		}
 	}
 
-	if($id_project > 0) $sql.= ' AND fk_projet='.$id_project;
+	if($id_project > 0) {
+		$sql.= ' AND fk_projet='.$id_project;
+	} else {
+		global $user;
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+		$sql.= ' AND pt.fk_projet IN ('.(new Project($db))->getProjectsAuthorizedForUser($user, 0, 1).')';
+	}
 
 	if (getDolGlobalInt('SCRUM_FILTER_BY_USER_ENABLE') && $fk_user > 0)
 	{
@@ -207,7 +220,7 @@ function getSQLForTasks(
 
 		if ($soc_type === 'onlychildren' || $soc_type === 'both')
 		{
-			$resql = $db->query('SELECT rowid FROM '.MAIN_DB_PREFIX.'societe WHERE parent = '.$fk_soc);
+			$resql = $db->query('SELECT rowid FROM '.$db->prefix().'societe WHERE parent = '.$fk_soc);
 			if ($resql)
 			{
 				$TSocId = array();
@@ -305,8 +318,8 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	if($id_task) $task->fetch($id_task);
 
 	$sql = 'SELECT sourcetype, fk_source
-		FROM ' . MAIN_DB_PREFIX . 'element_element
-		WHERE targettype = "' . $task->element . '"
+		FROM ' . $db->prefix() . 'element_element
+		WHERE targettype = \'' . $db->escape($task->element) . '\'
 		AND fk_target = ' . intval($task->id);
 
 	$resql = $db->query($sql);
@@ -336,7 +349,10 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 	}
 
 	if(!empty($values)){
-		_set_values($task, $values);
+		$allowedValues = array_intersect_key($values, array_flip(array('label', 'progress', 'status', 'story_k', 'scrum_status')));
+		$allowedValues['progress'] = isset($allowedValues['progress']) ? max(0, min(100, (int) $allowedValues['progress'])) : $task->progress;
+		_set_values($task, $allowedValues);
+		$values = $allowedValues + array('status' => '', 'story_k' => 0, 'scrum_status' => '');
 
 		if($values['status']=='inprogress') {
 			if($task->progress==0)$task->progress = 5;
@@ -352,10 +368,10 @@ function getTaskDetailsForScrumboardCard(&$db, $id_task, $values=array()) {
 		$task->status = $values['status'];
 		$task->update($user);
 
-		$db->query("UPDATE ".MAIN_DB_PREFIX.$task->table_element."
+		$db->query("UPDATE ".$db->prefix().$task->table_element."
 			SET story_k=".(int)$values['story_k']."
-			,scrum_status='".$values['scrum_status']."'
-		WHERE rowid=".$task->id);
+			,scrum_status='".$db->escape($values['scrum_status'])."'
+		WHERE rowid=".((int) $task->id));
 	}
 
 	// Méthodes sur les commentaires ajoutées en standard depuis la 7.0
@@ -479,6 +495,24 @@ function _get_delivery_date_with_velocity(&$db, &$task, $velocity, $time=null) {
 	}
 }
 
+/**
+ * Set values
+ *
+ * @param   object  $object Object to update
+ * @param   array   $values Values to set
+ * @return  void
+ */
+function _set_values(&$object, $values)
+{
+
+	foreach ($values as $k=>$v) {
+		if (property_exists($object, $k)) {
+			$object->{$k} = $v;
+		}
+	}
+}
+
+
 function _reset_date_task(&$db, $id_project, $velocity) {
 	global $user;
 
@@ -488,8 +522,8 @@ function _reset_date_task(&$db, $id_project, $velocity) {
 	$project->fetch($id_project);
 
 
-	$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."projet_task
-WHERE fk_projet=".$id_project." AND progress<100
+	$sql = "SELECT rowid FROM ".$db->prefix()."projet_task
+WHERE fk_projet=".((int) $id_project)." AND progress<100
 ORDER BY rang";
 
 	$res = $db->query($sql);

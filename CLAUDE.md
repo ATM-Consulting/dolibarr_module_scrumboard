@@ -9,8 +9,8 @@ optionnel accessible depuis le menu Projets.
 - PHP / Dolibarr (module custom sous `htdocs/custom/scrumboard/`).
 - Compatibilité déclarée : Dolibarr >= 16 (`need_dolibarr_version`), PHP >= 7.0.
 - Descripteur : `core/modules/modscrumboard.class.php` (numéro module `104210`).
-- Aucune suite de tests (pas de `composer.json`/`phpunit.xml` ; `.travis.yml` est du
-  boilerplate obsolète non fonctionnel).
+- Tests PHPUnit : `test/phpunit/ScrumboardTest.php` (sprints, colonnes, casts des filtres, champs modifiables d'une tâche).
+- Plus de dépendance à Abricot depuis la 2.8.6 : classes `TStory` et `ScrumboardColumn` en SQL direct.
 
 ## Structure
 
@@ -24,7 +24,8 @@ optionnel accessible depuis le menu Projets.
   de version ATM (`TechATM::getLastModuleVersionUrl`).
 - `lib/scrumboard.lib.php` — helpers (dont `scrumboardAdminPrepareHead`).
 - `sql/` — tables (dont `c_scrum_columns`, dictionnaire des colonnes kanban).
-- `script/create-maj-base.php` — création/màj du schéma, appelé par `init()`.
+- `sql/*.sql` — tables des sprints (`projet_storie`) et des colonnes ; les `.key.sql` passent la clé en AUTO_INCREMENT sur les anciennes installations. `script/migration_stories.php` — reprise de l'ancien champ « stories ».
+- `script/interface.php` — service AJAX du board : module + droit projet + jeton + accès au projet de chaque tâche ou sprint ; seuls label, progress, status, story_k et scrum_status d'une tâche sont modifiables.
 - `langs/` — fr_FR, en_US, es_ES, it_IT, el_GR. `doc/` — rapports de compat.
 
 ## Conventions & pièges
@@ -42,6 +43,10 @@ optionnel accessible depuis le menu Projets.
 - Toute nouvelle clé `$langs->trans()` : compléter au minimum `fr_FR` + `en_US`.
 - Versioning : chiffre du milieu pour une feature, dernier pour un fix ;
   ChangeLog.md à jour à chaque PR.
+
+## Dette connue
+
+- `script/scrum.js.php` est un fichier JavaScript généré par PHP (règle : JS statique + données en `data-*`) ; à convertir.
 
 ## Commandes
 
