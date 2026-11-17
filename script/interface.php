@@ -16,19 +16,67 @@
  */
 
 if (!defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', 1); // Disables token renewal
-if (!defined('NOCSRFCHECK')) define('NOCSRFCHECK', 1);
 
-require '../config.php';
+$res = @include '../../main.inc.php'; // From htdocs directory
+if (!$res) {
+	$res = @include '../../../main.inc.php'; // From "custom" directory
+}
+if (!$res) {
+	die('Include of main fails');
+}
 require_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
-dol_include_once('scrumboard/lib/scrumboard.lib.php');
-dol_include_once('scrumboard/class/scrumboard.class.php');
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+require_once __DIR__ . '/../lib/scrumboard.lib.php';
+require_once __DIR__ . '/../class/scrumboard.class.php';
 
 $hookmanager->initHooks(array('scrumboardinterface'));
 
-$get = GETPOST('get', 'alpha');
-$put = GETPOST('put', 'alpha');
-// Désactivation de la règle de nommage pour ce fichier procédural
+if (!isModEnabled('scrumboard') || !$user->hasRight('projet', 'lire')) {
+	accessforbidden();
+}
+if (GETPOST('token', 'alpha') !== currentToken()) {
+	httponly_accessforbidden('Bad token');
+}
+
+$get = GETPOST('get', 'aZ09');
+$put = GETPOST('put', 'aZ09');
+
+/**
+ * Tell if the user can read a project, and write it when asked.
+ *
+ * @param  int  $id_project Project ID, 0 for the shared board
+ * @param  bool $write      True to check the right to modify the project too
+ * @return bool
+ */
+function _canAccessProject($id_project, $write = false)
+{
+	global $user;
+
+	if ($write && !$user->hasRight('projet', 'creer')) {
+		return false;
+	}
+
+	return (int) $id_project <= 0 ? !$write : (bool) checkUserAccessToObject($user, array('projet'), (int) $id_project);
+}
+
+/**
+ * Tell if the user can modify the project of a task.
+ *
+ * @param  int $id_task Task ID
+ * @return bool
+ */
+function _canWriteTask($id_task)
+{
+	global $db;
+
+	$task = new Task($db);
+
+	return $id_task > 0 && $task->fetch($id_task) > 0 && _canAccessProject($task->fk_project, true);
+}
+
 // phpcs:disable PEAR.NamingConventions.ValidFunctionName
 _put($db, $put);
 _get($db, $get);
@@ -45,35 +93,46 @@ function _get(&$db, $case)
 {
 	switch ($case) {
 		case 'tasks' :
+			if (!_canAccessProject((int) GETPOST('id_project', 'int'))) {
+				accessforbidden();
+			}
 			$task = new Task($db);
 			$extrafieldstask = new ExtraFields($db);
 			$extrafieldstask->fetch_name_optionals_label($task->table_element);
 			$search_array_options = $extrafieldstask->getOptionalsFromPost($task->table_element, '', 'search_');
 			$TDateFilter = array(
-				dol_mktime(0,   0,  0, GETPOST('start_date_aftermonth'),  GETPOST('start_date_afterday'),  GETPOST('start_date_afteryear')),
-				dol_mktime(23, 59, 59, GETPOST('start_date_beforemonth'), GETPOST('start_date_beforeday'), GETPOST('start_date_beforeyear')),
-				dol_mktime(0,   0,  0, GETPOST('end_date_aftermonth'),    GETPOST('end_date_afterday'),    GETPOST('end_date_afteryear')),
-				dol_mktime(23, 59, 59, GETPOST('end_date_beforemonth'),   GETPOST('end_date_beforeday'),   GETPOST('end_date_beforeyear')),
+				dol_mktime(0,   0,  0, GETPOST('start_date_aftermonth', 'int'),  GETPOST('start_date_afterday', 'int'),  GETPOST('start_date_afteryear', 'int')),
+				dol_mktime(23, 59, 59, GETPOST('start_date_beforemonth', 'int'), GETPOST('start_date_beforeday', 'int'), GETPOST('start_date_beforeyear', 'int')),
+				dol_mktime(0,   0,  0, GETPOST('end_date_aftermonth', 'int'),    GETPOST('end_date_afterday', 'int'),    GETPOST('end_date_afteryear', 'int')),
+				dol_mktime(23, 59, 59, GETPOST('end_date_beforemonth', 'int'),   GETPOST('end_date_beforeday', 'int'),   GETPOST('end_date_beforeyear', 'int')),
 			);
-			$labelFilter = GETPOST('label');
-			$countryFilter = GETPOST('country_id');
-			$stateFilter = GETPOST('state_id');
-			print json_encode(_tasks($db, (int) GETPOST('id_project'), GETPOST('status'), GETPOST('fk_user'), GETPOST('fk_soc'), GETPOST('soc_type'), $TDateFilter, $search_array_options, $task, $extrafieldstask, $labelFilter, $countryFilter, $stateFilter));
+			$labelFilter = GETPOST('label', 'alphanohtml');
+			$countryFilter = GETPOST('country_id', 'int');
+			$stateFilter = GETPOST('state_id', 'int');
+			print json_encode(_tasks($db, (int) GETPOST('id_project', 'int'), GETPOST('status', 'aZ09'), GETPOST('fk_user', 'int'), GETPOST('fk_soc', 'int'), GETPOST('soc_type', 'aZ09'), $TDateFilter, $search_array_options, $task, $extrafieldstask, $labelFilter, $countryFilter, $stateFilter));
 
 			break;
 		case 'task' :
 
-			print json_encode(getTaskDetailsForScrumboardCard($db, (int) GETPOST('id')));
+			$id_task = (int) GETPOST('id', 'int');
+			$readTask = new Task($db);
+			if ($id_task <= 0 || $readTask->fetch($id_task) <= 0 || !_canAccessProject($readTask->fk_project)) {
+				accessforbidden();
+			}
+			print json_encode(getTaskDetailsForScrumboardCard($db, $id_task));
 
 			break;
 
 		case 'velocity':
 
-			print json_encode(_velocity($db, (int) GETPOST('id_project')));
+			if (!_canAccessProject((int) GETPOST('id_project', 'int')) || (int) GETPOST('id_project', 'int') <= 0) {
+				accessforbidden();
+			}
+			print json_encode(_velocity($db, (int) GETPOST('id_project', 'int')));
 
 			break;
 		case 'get_state_selector':
-			_print_state_selector($db, GETPOST('preselected_state_id'), GETPOST('country_id'));
+			_print_state_selector($db, GETPOST('preselected_state_id', 'int'), GETPOST('country_id', 'int'));
 	}
 }
 
@@ -89,25 +148,48 @@ function _put(&$db, $case)
 	switch ($case) {
 		case 'task' :
 
-			print json_encode(getTaskDetailsForScrumboardCard($db, (int) GETPOST('id'), $_REQUEST));
+			if (!_canWriteTask((int) GETPOST('id', 'int'))) {
+				accessforbidden();
+			}
+			print json_encode(getTaskDetailsForScrumboardCard($db, (int) GETPOST('id', 'int'), array(
+				'label' => GETPOST('label', 'alphanohtml'),
+				'progress' => GETPOST('progress', 'int'),
+				'status' => GETPOST('status', 'aZ09'),
+				'story_k' => GETPOST('story_k', 'int'),
+				'scrum_status' => GETPOST('scrum_status', 'aZ09'),
+			)));
 
 			break;
 
 		case 'sort-task' :
-			$TTaskID = GETPOST('TTaskID');
-			_sort_task($db, empty($TTaskID) ? array() : $TTaskID);
+			$TTaskID = array_map('intval', GETPOST('TTaskID', 'array'));
+			foreach ($TTaskID as $idToSort) {
+				if (!_canWriteTask($idToSort)) {
+					accessforbidden();
+				}
+			}
+			_sort_task($db, $TTaskID);
 
 			break;
 		case 'reset-date-task':
 
-			_reset_date_task($db, (int) GETPOST('id_project'), (float) GETPOST('velocity') * 3600);
+			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
+				accessforbidden();
+			}
+			_reset_date_task($db, (int) GETPOST('id_project', 'int'), (float) price2num(GETPOST('velocity', 'alphanohtml')) * 3600);
 
 			break;
 		case 'add_new_storie':
-			_add_new_storie((int) GETPOST('id_project'), GETPOST('storie_name'));
+			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
+				accessforbidden();
+			}
+			_add_new_storie((int) GETPOST('id_project', 'int'), GETPOST('storie_name', 'alphanohtml'));
 			break;
 		case 'toggle_storie_visibility':
-			_toggle_storie_visibility((int) GETPOST('id_project'), (int) GETPOST('storie_order'));
+			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
+				accessforbidden();
+			}
+			_toggle_storie_visibility((int) GETPOST('id_project', 'int'), (int) GETPOST('storie_order', 'int'));
 			break;
 	}
 }
@@ -177,23 +259,6 @@ function _sort_task(&$db, $TTask)
 }
 
 /**
- * Set values
- *
- * @param   object  $object Object to update
- * @param   array   $values Values to set
- * @return  void
- */
-function _set_values(&$object, $values)
-{
-
-	foreach ($values as $k=>$v) {
-		if (property_exists($object, $k)) {
-			$object->{$k} = $v;
-		}
-	}
-}
-
-/**
  * Get tasks
  *
  * @param DoliDB        $db                     Database handler
@@ -245,8 +310,7 @@ function _tasks(&$db, $id_project, $status, $fk_user, $fk_soc, $soc_type, $TDate
 	$TTask = array();
 	if ($status == 'unknownColumn') {
 		$scrumboardColumn = new ScrumboardColumn;
-		$PDOdb=new TPDOdb;
-		$scrumboardColumn->LoadAllBy($PDOdb, array('entity'=>$conf->entity));
+		$scrumboardColumn->LoadAllBy($db, array('entity' => $conf->entity));
 		$defaultColumn = $scrumboardColumn->getDefaultColumn();
 	}
 
@@ -267,15 +331,16 @@ function _tasks(&$db, $id_project, $status, $fk_user, $fk_soc, $soc_type, $TDate
  */
 function _add_new_storie($id_project, $storie_name)
 {
-	$story = new TStory;
-	$PDOdb = new TPDOdb;
+	global $db, $langs;
+
+	$story = new TStory($db);
 
 	$storie_order = GETPOST('storie_order', 'int');
-	$storie_date_start = dol_mktime(12, 0, 0, GETPOST('add_storie_date_startmonth'), GETPOST('add_storie_date_startday'), GETPOST('add_storie_date_startyear'));
-	$storie_date_end = dol_mktime(12, 0, 0, GETPOST('add_storie_date_endmonth'), GETPOST('add_storie_date_endday'), GETPOST('add_storie_date_endyear'));
+	$storie_date_start = dol_mktime(12, 0, 0, GETPOST('add_storie_date_startmonth', 'int'), GETPOST('add_storie_date_startday', 'int'), GETPOST('add_storie_date_startyear', 'int'));
+	$storie_date_end = dol_mktime(12, 0, 0, GETPOST('add_storie_date_endmonth', 'int'), GETPOST('add_storie_date_endday', 'int'), GETPOST('add_storie_date_endyear', 'int'));
 
 	if ($storie_date_start > $storie_date_end) {
-		setEventMessage('DateStartAfterDateEnd', 'errors');
+		setEventMessage($langs->trans('DateStartAfterDateEnd'), 'errors');
 		return;
 	}
 
@@ -286,7 +351,9 @@ function _add_new_storie($id_project, $storie_name)
 	if (! empty($storie_date_start)) $story->date_start = $storie_date_start;
 	if (! empty($storie_date_end)) $story->date_end = $storie_date_end;
 
-	$story->save($PDOdb);
+	if ($story->save() < 0) {
+		setEventMessages($story->error, null, 'errors');
+	}
 }
 
 /**
@@ -298,10 +365,12 @@ function _add_new_storie($id_project, $storie_name)
  */
 function _toggle_storie_visibility($id_project, $storie_order)
 {
-	$story = new TStory;
-	$story->loadStory($id_project, $storie_order);
+	global $db;
 
-	$story->toggleVisibility();
+	$story = new TStory($db);
+	if ($story->loadStory($id_project, $storie_order) > 0) {
+		$story->toggleVisibility();
+	}
 }
 
 /**
