@@ -39,7 +39,7 @@
 
 jQuery.ajaxPrefilter(function (options) {
 	if (options.url && options.url.indexOf('script/interface.php') !== -1) {
-		options.data = (options.data ? options.data + '&' : '') + 'token=<?php echo urlencode(newToken()); ?>';
+		options.data = (options.data ? options.data + '&' : '') + 'token=<?php echo urlencode(currentToken()); ?>';
 	}
 });
 
