@@ -7,8 +7,8 @@ td.projectDrag {
 	vertical-align: top;
 	background: #fff;
 	border:1px solid #2AA8B9;
-	width:33%;
-	min-width: 200px;
+	width: var(--scrum-column-width, 33%);
+	min-width: 100px;
 	padding:1px 1px 1px 1px;
 }
 .projectDrag ul {
@@ -128,7 +128,7 @@ div.bodyline {
 /*
  * scrumboard V2
  */
- 
+
 .width32p { width:32%; }
 .width68p { width:68%; }
 .task-content {
@@ -138,7 +138,7 @@ div.bodyline {
 	box-sizing: border-box;
 }
 .task-ref, .task-title {
-	margin-bottom:5px; 
+	margin-bottom:5px;
 }
 .task-actions {
 	padding: 10px 0 10px 10px;

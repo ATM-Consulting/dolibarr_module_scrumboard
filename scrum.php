@@ -320,7 +320,7 @@
 		exit;
 	}
 
-	llxHeader('', $langs->trans('Tasks') , '','',0,0, array('/scrumboard/script/scrum.js.php'), $TArrayOfCss, '', join(' ', $TArrayOfCssClasses));
+	llxHeader('', $langs->trans('Tasks') , '','',0,0, array('/scrumboard/js/scrumboard.js'), $TArrayOfCss, '', join(' ', $TArrayOfCssClasses));
 
 	$ref = GETPOST('ref', 'aZ09');
 	$id_projet = (int) GETPOST('id', 'int');
@@ -704,18 +704,46 @@
 ?>
 <link rel="stylesheet" type="text/css" title="default" href="<?php echo dol_buildpath('/scrumboard/css/scrum.css',1) ?>">
 
-<style type="text/css">
-
-td.projectDrag {
-	<?php
-	// On calcule la largeur de chaque colonne en fonction du nombre de colonne
-	$calculatedWidth = 100 / $nbColumns;
-	echo 'width: '.$calculatedWidth.'%';
-	?>;
-	min-width:100px;
-}
-
-</style>
+<?php
+$scrumColumnForContext = new ScrumboardColumn;
+$scrumColumnForContext->LoadAllBy($db, array('entity' => $conf->entity));
+$scrumboardContext = array(
+	'token' => currentToken(),
+	'pageToken' => newToken(),
+	'projectId' => (int) $id_projet,
+	'columnWidth' => 100 / max(1, $nbColumns),
+	'columns' => array_values(array_map(static function ($column) {
+		return (string) $column->code;
+	}, $TColumn)),
+	'defaultColumn' => (string) $scrumColumnForContext->getDefaultColumn(),
+	'addBacklogReviewColumn' => (bool) getDolGlobalInt('SCRUM_ADD_BACKLOG_REVIEW_COLUMN'),
+	'showLinkedContact' => (bool) getDolGlobalInt('SCRUM_SHOW_LINKED_CONTACT'),
+	'allowComment' => (bool) getDolGlobalInt('PROJECT_ALLOW_COMMENT_ON_TASK'),
+	'showDesc' => isset($_SESSION['scrumboard']['showdesc']) ? $_SESSION['scrumboard']['showdesc'] : array(),
+	'urls' => array(
+		'task' => dol_buildpath('/projet/tasks/task.php', 1),
+		'tasks' => dol_buildpath('/projet/tasks.php', 1),
+		'order' => dol_buildpath('commande/card.php', 1),
+		'propal' => dol_buildpath('comm/propal/card.php', 1),
+		'time' => dol_buildpath('/projet/tasks/time.php', 1),
+		'comment' => dol_buildpath('/projet/tasks/comment.php', 1),
+		'scrum' => dol_buildpath('/scrumboard/scrum.php', 1),
+		'calendarIcon' => DOL_URL_ROOT.'/theme/'.$conf->theme.'/img/object_calendarday.png',
+	),
+	'texts' => array(
+		'hide' => $langs->transnoentities('Hide'),
+		'show' => $langs->transnoentities('Show'),
+		'addTask' => html_entity_decode($langs->transnoentities('AddTask')),
+		'timeAdded' => $langs->transnoentities('TimeAdded'),
+		'commentAdded' => $langs->transnoentities('CommentAdded'),
+		'yes' => $langs->transnoentities('Yes'),
+		'no' => $langs->transnoentities('No'),
+		'add' => $langs->transnoentities('Add'),
+		'cancel' => $langs->transnoentities('Cancel'),
+	),
+);
+print '<script type="application/json" id="scrumboard-context">'.json_encode($scrumboardContext, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT).'</script>';
+?>
 
 <div class="content">
 <?php
@@ -1163,13 +1191,6 @@ if($action == 'addressourcetotask' && !empty($id_task)) {
 
 		</div>
 
-		<script type="text/javascript">
-			$(document).ready(function() {
-				project_loadTasks(<?php echo $id_projet ?>);
-				project_init_change_type(<?php echo $id_projet ?>);
-				project_velocity(<?php echo $id_projet ?>);
-			});
-		</script>
 
 <?php
 

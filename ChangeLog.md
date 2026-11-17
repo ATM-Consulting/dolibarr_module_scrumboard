@@ -1,6 +1,7 @@
 
 
 ## NOT RELEASED
+- FIX : Quality pass, second part. The setup page uses FormSetup. The page script is now the static file js/scrumboard.js (was script/scrum.js.php): texts, urls, token and options come from a JSON block printed by the page, the inline style and script of the page are removed, and `var` is replaced by `let`. On upgrade: no database change. - 2.8.7
 - FIX : Quality pass. The board service (script/interface.php) now needs the module and project rights, checks that the user can read or modify the project of each task or sprint, and requires the CSRF token (the JavaScript adds it to its calls). A task can only be changed through its label, progress, status, column and sprint (before, any field of the request was copied on the task). The filters of the board (user, thirdparty, country, state, project) are cast before they reach the SQL query, and the sprint actions of the board page need the right to modify the project. An empty label, status or column in a task update is ignored instead of emptying the task. The Abricot framework dependency is removed: the sprint and column tables are created by SQL files, config.php and create-maj-base.php are deleted. On upgrade: reactivate the module. - 2.8.6
 - FIX : Deprecated Form::select_date replaced by Form::selectDate on the scrum page (story dates and story filters) - 2.8.5
 - FIX : PHP warning "Undefined array key" on the board extrafields filters when a filter has no submitted value - 2.8.4

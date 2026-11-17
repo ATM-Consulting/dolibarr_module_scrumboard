@@ -15,7 +15,8 @@ optionnel accessible depuis le menu Projets.
 ## Structure
 
 - `scrum.php` — page principale du board (par projet et vue globale).
-- `admin/scrumboard_setup.php` — page de configuration (constantes du module).
+- `admin/scrumboard_setup.php` — page de configuration (FormSetup).
+- `js/scrumboard.js` — JS du tableau ; lit le bloc JSON `#scrumboard-context` imprimé par `scrum.php` (textes, urls, jetons, options).
 - `core/modules/modscrumboard.class.php` — descripteur (menus, onglets, droits,
   dictionnaire des colonnes, migration de constantes dans `init()`).
 - `core/triggers/` — triggers ; `class/actions_scrumboard.class.php` — hooks
@@ -46,7 +47,6 @@ optionnel accessible depuis le menu Projets.
 
 ## Dette connue
 
-- `script/scrum.js.php` est un fichier JavaScript généré par PHP (règle : JS statique + données en `data-*`) ; à convertir.
 
 ## Commandes
 
