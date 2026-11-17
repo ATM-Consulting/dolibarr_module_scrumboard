@@ -42,6 +42,12 @@
 	if (GETPOST('id', 'int') > 0 && !checkUserAccessToObject($user, array('projet'), GETPOST('id', 'int'))) {
 		accessforbidden();
 	}
+	if (GETPOST('ref', 'aZ09') !== '') {
+		$projectByRef = new Project($db);
+		if ($projectByRef->fetch(0, GETPOST('ref', 'aZ09')) > 0 && !checkUserAccessToObject($user, array('projet'), (int) $projectByRef->id)) {
+			accessforbidden();
+		}
+	}
 
 	$TArrayOfCss = array();
 	$TArrayOfCssClasses = array();
@@ -476,6 +482,9 @@
 
 			$taskObject = new Task($db);
 			$resulttaskfetch = $taskObject->fetch($id_task);
+			if ($resulttaskfetch <= 0 || !checkUserAccessToObject($user, array('projet'), (int) $taskObject->fk_project)) {
+				accessforbidden();
+			}
 
 			$proj = new Project($db);
 			if ($taskObject->fk_project) $proj->fetch($taskObject->fk_project);

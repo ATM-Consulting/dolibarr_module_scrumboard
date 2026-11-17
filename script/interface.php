@@ -34,11 +34,26 @@ require_once __DIR__ . '/../class/scrumboard.class.php';
 
 $hookmanager->initHooks(array('scrumboardinterface'));
 
-if (!isModEnabled('scrumboard') || !$user->hasRight('projet', 'lire')) {
-	accessforbidden();
+/**
+ * Answer a refused call as JSON, which is what the script expects.
+ *
+ * @param  string $message Reason
+ * @return void
+ */
+function _deny(string $message): void
+{
+	http_response_code(403);
+	header('Content-Type: application/json');
+	print json_encode(array('error' => true, 'message' => $message));
+	exit;
 }
-if (GETPOST('token', 'alpha') !== currentToken()) {
-	httponly_accessforbidden('Bad token');
+
+if (!isModEnabled('scrumboard') || !$user->hasRight('projet', 'lire')) {
+	_deny('Access denied');
+}
+$postedToken = GETPOST('token', 'alpha');
+if (!hash_equals(newToken(), $postedToken) && !hash_equals(currentToken(), $postedToken)) {
+	_deny('Bad token');
 }
 
 $get = GETPOST('get', 'aZ09');
@@ -94,7 +109,7 @@ function _get(&$db, $case)
 	switch ($case) {
 		case 'tasks' :
 			if (!_canAccessProject((int) GETPOST('id_project', 'int'))) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			$task = new Task($db);
 			$extrafieldstask = new ExtraFields($db);
@@ -117,7 +132,7 @@ function _get(&$db, $case)
 			$id_task = (int) GETPOST('id', 'int');
 			$readTask = new Task($db);
 			if ($id_task <= 0 || $readTask->fetch($id_task) <= 0 || !_canAccessProject($readTask->fk_project)) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			print json_encode(getTaskDetailsForScrumboardCard($db, $id_task));
 
@@ -126,7 +141,7 @@ function _get(&$db, $case)
 		case 'velocity':
 
 			if (!_canAccessProject((int) GETPOST('id_project', 'int')) || (int) GETPOST('id_project', 'int') <= 0) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			print json_encode(_velocity($db, (int) GETPOST('id_project', 'int')));
 
@@ -149,7 +164,7 @@ function _put(&$db, $case)
 		case 'task' :
 
 			if (!_canWriteTask((int) GETPOST('id', 'int'))) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			print json_encode(getTaskDetailsForScrumboardCard($db, (int) GETPOST('id', 'int'), array(
 				'label' => GETPOST('label', 'alphanohtml'),
@@ -165,7 +180,7 @@ function _put(&$db, $case)
 			$TTaskID = array_map('intval', GETPOST('TTaskID', 'array'));
 			foreach ($TTaskID as $idToSort) {
 				if (!_canWriteTask($idToSort)) {
-					accessforbidden();
+					_deny('Access denied');
 				}
 			}
 			_sort_task($db, $TTaskID);
@@ -174,20 +189,20 @@ function _put(&$db, $case)
 		case 'reset-date-task':
 
 			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			_reset_date_task($db, (int) GETPOST('id_project', 'int'), (float) price2num(GETPOST('velocity', 'alphanohtml')) * 3600);
 
 			break;
 		case 'add_new_storie':
 			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			_add_new_storie((int) GETPOST('id_project', 'int'), GETPOST('storie_name', 'alphanohtml'));
 			break;
 		case 'toggle_storie_visibility':
 			if (!_canAccessProject((int) GETPOST('id_project', 'int'), true)) {
-				accessforbidden();
+				_deny('Access denied');
 			}
 			_toggle_storie_visibility((int) GETPOST('id_project', 'int'), (int) GETPOST('storie_order', 'int'));
 			break;
