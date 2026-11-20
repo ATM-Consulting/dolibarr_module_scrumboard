@@ -29,6 +29,7 @@ require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once __DIR__ . '/../lib/scrumboard.lib.php';
 require_once __DIR__ . '/../class/scrumboard.class.php';
 

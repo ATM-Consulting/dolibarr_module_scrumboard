@@ -33,6 +33,13 @@
 	require_once __DIR__.'/class/scrumboard.class.php';
 	require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 	require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+	require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
+	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+	require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+	require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
+	require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+
+	$langs->loadLangs(array('projects', 'companies', 'scrumboard@scrumboard'));
 
     $hookmanager->initHooks(array('scrumboardcard'));
 
