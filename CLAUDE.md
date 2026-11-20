@@ -10,7 +10,7 @@ optionnel accessible depuis le menu Projets.
 - Compatibilité déclarée : Dolibarr >= 16 (`need_dolibarr_version`), PHP >= 7.0.
 - Descripteur : `core/modules/modscrumboard.class.php` (numéro module `104210`).
 - Tests PHPUnit : `test/phpunit/ScrumboardTest.php` (sprints, colonnes, casts des filtres, champs modifiables d'une tâche).
-- Plus de dépendance à Abricot depuis la 2.8.6 : classes `TStory` et `ScrumboardColumn` en SQL direct.
+- Plus de dépendance à Abricot depuis la 2.8.6 : classes `TStory` et `ScrumboardColumn` en SQL direct. `scrum.php` et `lib/scrumboard.lib.php` chargent eux-mêmes les libs du coeur (project, task, societe, date) : l'ancien `config.php` Abricot le faisait en silence ; `ScrumboardIncludesTest` le garde.
 
 ## Structure
 
