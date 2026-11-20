@@ -117,31 +117,28 @@ class Interfacescrumboardtrigger
 		// Projects
 
 		if ($action == 'PROJECT_CREATE') {
-			if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR', true);
-			dol_include_once('/scrumboard/config.php');
-			dol_include_once('/scrumboard/class/scrumboard.class.php');
-			$PDOdb = new TPDOdb;
+			require_once dirname(__DIR__, 2).'/class/scrumboard.class.php';
 
-			// Création d'un sprint par défaut
-			$story = new TStory;
+			$story = new TStory($this->db);
 			$story->fk_projet = $object->id;
 			$story->storie_order = 1;
 			$story->label = 'Sprint 1';
-			$story->save($PDOdb);
+			if ($story->save() < 0) {
+				$this->error = $story->error;
+				return -1;
+			}
 		} elseif ($action == 'PROJECT_DELETE') {
 			dol_syslog(
 				"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
 			);
-			if (!defined('INC_FROM_DOLIBARR')) define('INC_FROM_DOLIBARR', true);
-			dol_include_once('/scrumboard/config.php');
-			dol_include_once('scrumboard/class/scrumboard.class.php');
+			require_once dirname(__DIR__, 2).'/class/scrumboard.class.php';
 
-			$PDOdb = new TPDOdb;
-			$story = new TStory;
-
-			$TStorieToDelete = $story->getAllStoriesFromProject($object->id);
-			foreach ($TStorieToDelete as &$storyToDelete) {
-				$storyToDelete->delete($PDOdb);
+			$story = new TStory($this->db);
+			foreach ($story->getAllStoriesFromProject($object->id) as $storyToDelete) {
+				if ($storyToDelete->delete() < 0) {
+					$this->error = $storyToDelete->error;
+					return -1;
+				}
 			}
 
 			// Supprime les liens
