@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/../backport/v19/core/class/commonhookactions.class.php';
+require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 
 /**
  * Class ActionsScrumboard
