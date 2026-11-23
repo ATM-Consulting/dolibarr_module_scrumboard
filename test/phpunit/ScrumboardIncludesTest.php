@@ -21,6 +21,7 @@ class ScrumboardIncludesTest extends TestCase
 			'board page' => ['scrum.php'],
 			'board service' => ['script/interface.php'],
 			'library' => ['lib/scrumboard.lib.php'],
+			'hook' => ['class/actions_scrumboard.class.php'],
 		];
 	}
 
